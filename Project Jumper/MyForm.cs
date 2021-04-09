@@ -93,7 +93,7 @@ namespace Project_Jumper
             Graphics g = e.Graphics;
             for (var i = 0; i < map.Width; i++)
                 for (var j = 0; j < map.Height; j++)
-                    if (map.Level[i, j] == 'X')
+                    if (map.Level[i, j].Name == "Border")
                         g.DrawImage(Border, i * SizeValue, j * SizeValue);
             g.DrawImage(playerSkin, player.X, player.Y);
         }

@@ -8,6 +8,7 @@ namespace Project_Jumper
     public class Player
     {
         readonly int Velocity = 10;
+        private int Gravity { get; set; }
         public int X { get; private set; }
         public int Y { get; private set; }
         private int VelX { get; set; }
@@ -22,6 +23,7 @@ namespace Project_Jumper
         {
             X = x;
             Y = y;
+            Gravity = 1;
         }
 
         public void Move()
@@ -56,7 +58,10 @@ namespace Project_Jumper
             if (JumpStart == null)
                 JumpStart = DateTime.Now;
             var t = ((TimeSpan)(DateTime.Now - JumpStart)).TotalSeconds;
-            VelY = (int)(Velocity * 1.5 - 30 * t);
+            VelY = Gravity * (int)(Velocity * 1.5 - 30 * t);
         }
+
+        public void SwitchGravity() =>
+            Gravity = Gravity == 1 ? -1 : 1;
     }
 }
