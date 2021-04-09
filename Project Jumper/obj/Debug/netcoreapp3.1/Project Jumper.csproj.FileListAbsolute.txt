@@ -1,0 +1,16 @@
+C:\Users\Trixter\Documents\GitHub\UlearnGame\Project Jumper\obj\Debug\netcoreapp3.1\Project Jumper.csprojAssemblyReference.cache
+C:\Users\Trixter\Documents\GitHub\UlearnGame\Project Jumper\obj\Debug\netcoreapp3.1\Project_Jumper.MyForm.resources
+C:\Users\Trixter\Documents\GitHub\UlearnGame\Project Jumper\obj\Debug\netcoreapp3.1\Project Jumper.csproj.GenerateResource.cache
+C:\Users\Trixter\Documents\GitHub\UlearnGame\Project Jumper\bin\Debug\netcoreapp3.1\Project Jumper.exe
+C:\Users\Trixter\Documents\GitHub\UlearnGame\Project Jumper\bin\Debug\netcoreapp3.1\Project Jumper.deps.json
+C:\Users\Trixter\Documents\GitHub\UlearnGame\Project Jumper\bin\Debug\netcoreapp3.1\Project Jumper.runtimeconfig.json
+C:\Users\Trixter\Documents\GitHub\UlearnGame\Project Jumper\bin\Debug\netcoreapp3.1\Project Jumper.runtimeconfig.dev.json
+C:\Users\Trixter\Documents\GitHub\UlearnGame\Project Jumper\bin\Debug\netcoreapp3.1\Project Jumper.dll
+C:\Users\Trixter\Documents\GitHub\UlearnGame\Project Jumper\bin\Debug\netcoreapp3.1\Project Jumper.pdb
+C:\Users\Trixter\Documents\GitHub\UlearnGame\Project Jumper\obj\Debug\netcoreapp3.1\Project_Jumper.Properties.Resources.resources
+C:\Users\Trixter\Documents\GitHub\UlearnGame\Project Jumper\obj\Debug\netcoreapp3.1\Project Jumper.AssemblyInfoInputs.cache
+C:\Users\Trixter\Documents\GitHub\UlearnGame\Project Jumper\obj\Debug\netcoreapp3.1\Project Jumper.AssemblyInfo.cs
+C:\Users\Trixter\Documents\GitHub\UlearnGame\Project Jumper\obj\Debug\netcoreapp3.1\Project Jumper.csproj.CoreCompileInputs.cache
+C:\Users\Trixter\Documents\GitHub\UlearnGame\Project Jumper\obj\Debug\netcoreapp3.1\Project Jumper.dll
+C:\Users\Trixter\Documents\GitHub\UlearnGame\Project Jumper\obj\Debug\netcoreapp3.1\Project Jumper.pdb
+C:\Users\Trixter\Documents\GitHub\UlearnGame\Project Jumper\obj\Debug\netcoreapp3.1\Project Jumper.genruntimeconfig.cache
