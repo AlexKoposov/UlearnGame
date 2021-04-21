@@ -69,6 +69,8 @@ namespace Project_Jumper
 
         private void ProcessCollisionX(Map map, int size)
         {
+            var plPos = new Point((int)Math.Round((double)X / size), (int)Math.Round((double)Y / size) - 1);
+
             if (!IsRightMoving && !IsLeftMoving)
                 VelX = 0;
             if (IsRightMoving && VelX < Velocity)
@@ -77,14 +79,39 @@ namespace Project_Jumper
                 VelX -= Velocity;
 
             var dirX = X + VelX;
-            if (dirX < size)
-                X = size;
-            else if (dirX > (map.Width - 2) * size)
-                X = (map.Width - 2) * size;
-            else X += VelX;
+            if (dirX < 0)
+            {
+                X = 0;
+                IsLeftMoving = false;
+            }
+            else
+            {
+                var left1 = new Point((int)Math.Floor((double)dirX / size) - 1, (int)Math.Floor((double)Y / size));
+                var left2 = new Point((int)Math.Floor((double)dirX / size) - 1, (int)Math.Ceiling((double)Y / size));
+                if (left1.X >= 0)
+                    if (map.Level[left1.X, left1.Y].Collision || map.Level[left2.X, left2.Y].Collision)
+                    {
+                        X = (left1.X + 1) * size;
+                        IsLeftMoving = false;
+                    }
+
+
+
+            }
+
+
+
+
+            if (dirX > (map.Width - 1) * size)
+            {
+                X = (map.Width - 1) * size;
+                IsRightMoving = false;
+            }
             var mapCellX = dirX / size;
 
 
+
+            X += VelX;
         }
 
         private void ProcessCollisionY(Map map, int size)
@@ -94,13 +121,11 @@ namespace Project_Jumper
             if (IsFalling)
                 Fall();
             var dirY = Y + VelY;
-            var playerRect = new Rectangle(X, Y, size, size);
-            var plTest = new Point((int)Math.Floor((double)X / size), (int)Math.Floor((double)Y / size));
+            var plPos = new Point((int)Math.Round((double)X / size), (int)Math.Round((double)Y / size) - 1);
+            var plPosY = new Point((int)Math.Round((double)X / size), (int)Math.Round((double)dirY / size) - 1);
 
             if (dirY < size)
             {
-                var down1 = new Point((int)Math.Floor((double)X / size), (int)Math.Floor((double)dirY / size));
-
                 Y = size;
                 IsFalling = false;
                 IsJumping = false;
@@ -108,61 +133,52 @@ namespace Project_Jumper
             }
             else
             {
-                //var downCell1 = new Rectangle((int)Math.Floor((double)X / size) * size, (int)Math.Floor((double)dirY / size) * size, size, size);
-                //var downCell2 = new Rectangle((int)Math.Ceiling((double)X / size) * size, (int)Math.Floor((double)dirY / size) * size, size, size);
-                var down1 = new Point((int)Math.Floor((double)X / size), (int)Math.Floor((double)dirY / size));
-                var down2 = new Point((int)Math.Ceiling((double)X / size), (int)Math.Floor((double)dirY / size));
-                //if (map.Level[downCell1.X / size, downCell1.Y / size].Collision && playerRect.IntersectsWith(downCell1) || map.Level[downCell2.X / size, downCell2.Y / size].Collision && playerRect.IntersectsWith(downCell2))
-                if (map.Level[down1.X, down1.Y].Collision || map.Level[down2.X, down2.Y].Collision)
-                {
-                    Y = (down1.Y + 2) * size;
-                    IsFalling = false;
-                    IsJumping = false;
-                    FallStart = null;
-                }
+                var down1 = new Point((int)Math.Floor((double)X / size), (int)Math.Floor((double)dirY / size) - 1);
+                var down2 = new Point((int)Math.Ceiling((double)X / size), (int)Math.Floor((double)dirY / size) - 1);
+                if (down1.Y >= 0)
+                    if (map.Level[down1.X, down1.Y].Collision || map.Level[down2.X, down2.Y].Collision)
+                    {
+                        Y = (down1.Y + 2) * size;
+                        IsFalling = false;
+                        IsJumping = false;
+                        FallStart = null;
+                    }
+                    else
+                    {
+                        IsFalling = true;
+                    }
             }
 
+            var upStuck = false;
             if (dirY > map.Height * size)
             {
-                Y = map.Height;
+                Y = map.Height * size;
+                IsFalling = false;
                 IsJumping = false;
+                FallStart = null;
+                upStuck = true;
             }
             else
             {
-                var upCell1 = new Rectangle((int)Math.Floor((double)X / size) * size, (int)Math.Ceiling((double)dirY / size) * size, size, size);
-                var upCell2 = new Rectangle((int)Math.Ceiling((double)X / size) * size, (int)Math.Ceiling((double)dirY / size) * size, size, size);
-            }
-            
+                var up1 = new Point((int)Math.Floor((double)X / size), (int)Math.Ceiling((double)dirY / size) - 1);
+                var up2 = new Point((int)Math.Ceiling((double)X / size), (int)Math.Ceiling((double)dirY / size) - 1);
+                if (up1.Y < map.Height)
+                    if (map.Level[up1.X, up1.Y].Collision || map.Level[up2.X, up2.Y].Collision)
+                    {
+                        Y = (up1.Y - 0) * size;
+                        IsFalling = false;
+                        IsJumping = false;
+                        FallStart = null;
+                        upStuck = true;
+                    }
 
-            //var mapCellX = (int)Math.Round((double)X / size);
-            //var mapCellY = (int)Math.Round((double)dirY / size);
-            //if (dirY < 0)
-            //{
-            //    Y = 0;
-            //    IsJumping = false;
-            //}
-            //else if (dirY > (map.Height - 1) * size)
-            //{
-            //    Y = (map.Height - 1) * size;
-            //    IsJumping = false;
-            //    IsFalling = false;
-            //    FallStart = null;
-            //}
-            //else if (map.Level[mapCellX, mapCellY].Collision)
-            //{
-            //    Y = (mapCellY - 1) * size;
-            //    IsJumping = false;
-            //    IsFalling = false;
-            //    FallStart = null;
-            //}
-            //else
-            //{
-            //    IsFalling = true;
-            //    Y -= VelY;
-            //}
+            }
+
+
             if (!IsJumping && !IsFalling)
                 VelY = 0;
             Y += VelY;
+            if (upStuck) IsFalling = true;
         }
     }
 }

@@ -79,6 +79,10 @@ namespace Project_Jumper
         {
             if (player.IsMoving)
                 player.Move(map, SizeValue);
+            Text = $"Position: X = {player.X}, Y = {player.Y}, " +
+                $"Map pos: ({Math.Round((double)player.X / SizeValue)}, {Math.Round((double)player.Y / SizeValue) - 1})" +
+                $"D: ({Math.Floor((double)player.X / SizeValue)}, {Math.Ceiling((double)player.X / SizeValue)}; {Math.Floor((double)player.Y / SizeValue) - 2})" +
+                $"D: ({Math.Floor((double)player.X / SizeValue)}, {Math.Ceiling((double)player.X / SizeValue)}; {Math.Ceiling((double)player.Y / SizeValue)})";
             Invalidate();
         }
 
@@ -92,6 +96,10 @@ namespace Project_Jumper
                         g.DrawImage(Border, i * SizeValue, j * SizeValue);
                     if (map.Level[i, j].Name == "Block")
                         g.DrawImage(Block, i * SizeValue, j * SizeValue);
+                    //if (map.Level[i, j].Name == "Border")
+                    //    g.DrawImage(Border, ConvertMathToWorld(i * SizeValue, j * SizeValue));
+                    //if (map.Level[i, j].Name == "Block")
+                    //    g.DrawImage(Block, ConvertMathToWorld(i * SizeValue, j * SizeValue));
                 }
             g.DrawImage(playerSkin, ConvertMathToWorld(player.X, player.Y));
         }

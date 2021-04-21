@@ -30,6 +30,7 @@ namespace Project_Jumper
                         Level[i, j] = new MapCell("Block", true, true);
                     else Level[i, j] = new MapCell("Space", true, false);
                 }
+            Level[6, 20] = new MapCell("Space", true, false);
         }
     }
 }
