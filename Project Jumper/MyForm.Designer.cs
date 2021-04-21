@@ -30,12 +30,12 @@ namespace Project_Jumper
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.gameTime = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
             // 
             // timer1
             // 
-            this.timer1.Enabled = true;
+            this.gameTime.Enabled = true;
             // 
             // MyForm
             // 
@@ -59,7 +59,7 @@ namespace Project_Jumper
 
         #endregion
 
-        private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.Timer gameTime;
     }
 }
 

@@ -20,13 +20,14 @@ namespace Project_Jumper
         Map map;
         Image playerSkin;
         Image Border;
+        Image Block;
 
         public MyForm()
         {
             InitializeComponent();
 
-            timer1.Interval = 10;
-            timer1.Tick += new EventHandler(Update);
+            gameTime.Interval = 10;
+            gameTime.Tick += new EventHandler(Update);
 
             KeyDown += new KeyEventHandler(OnPress);
             KeyUp += new KeyEventHandler(OnKeyUp);
@@ -44,13 +45,7 @@ namespace Project_Jumper
                 case Keys.D:
                     player.IsRightMoving = false;
                     break;
-                case Keys.Space:
-                    player.IsJumping = false;
-                    player.JumpStart = null;
-                    break;
             }
-            if (!player.IsLeftMoving && !player.IsRightMoving)
-                player.IsMoving = false;
         }
 
         public void OnPress(object sender, KeyEventArgs e)
@@ -67,24 +62,23 @@ namespace Project_Jumper
                     player.IsJumping = true;
                     break;
             }
-            if (player.IsLeftMoving || player.IsRightMoving)
-                player.IsMoving = true;
         }
 
         void Initialise()
         {
             currentPath = new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName.ToString();
-            player = new Player(1000, 400);
+            player = new Player(300, 100);
             playerSkin = FitInSize(new Bitmap(Path.Combine(currentPath, "Resources\\Cube.png")));
             Border = FitInSize(new Bitmap(Path.Combine(currentPath, "Resources\\Border.png")));
+            Block = FitInSize(new Bitmap(Path.Combine(currentPath, "Resources\\Block.png")));
             map = new Map(38, 21);
-            timer1.Start();
+            gameTime.Start();
         }
 
         public void Update(object sender, EventArgs e)
         {
-            if (player.IsMoving || player.IsJumping)
-                player.Move();
+            if (player.IsMoving)
+                player.Move(map, SizeValue);
             Invalidate();
         }
 
@@ -93,14 +87,20 @@ namespace Project_Jumper
             Graphics g = e.Graphics;
             for (var i = 0; i < map.Width; i++)
                 for (var j = 0; j < map.Height; j++)
+                {
                     if (map.Level[i, j].Name == "Border")
                         g.DrawImage(Border, i * SizeValue, j * SizeValue);
-            g.DrawImage(playerSkin, player.X, player.Y);
+                    if (map.Level[i, j].Name == "Block")
+                        g.DrawImage(Block, i * SizeValue, j * SizeValue);
+                }
+            g.DrawImage(playerSkin, ConvertMathToWorld(player.X, player.Y));
         }
 
         private Image FitInSize(Image image) =>
             new Bitmap(image, BlockSize);
 
+        private Point ConvertMathToWorld(int x, int y) =>
+            new Point(x, map.Height * SizeValue - y);
 
     }
 }

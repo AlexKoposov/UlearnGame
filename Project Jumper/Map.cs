@@ -26,6 +26,8 @@ namespace Project_Jumper
                         || i == Width - 1
                         || j == Height - 1)
                         Level[i, j] = new MapCell("Border", true, true);
+                    else if (i % 6 == 0 && j % 4 == 0)
+                        Level[i, j] = new MapCell("Block", true, true);
                     else Level[i, j] = new MapCell("Space", true, false);
                 }
         }
