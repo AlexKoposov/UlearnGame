@@ -82,35 +82,49 @@ namespace Project_Jumper
                 VelX -= Velocity;
 
             var dirX = X + VelX;
-            if (dirX < 0)
-            {
-                X = 0;
-                IsLeftMoving = false;
-            }
-            else
-            {
-                var left1 = new Point((int)Math.Floor((double)dirX / size) - 1, (int)Math.Floor((double)Y / size));
-                var left2 = new Point((int)Math.Floor((double)dirX / size) - 1, (int)Math.Ceiling((double)Y / size));
-                if (left1.X >= 0)
-                    if (map.Level[left1.X, left1.Y].Collision || map.Level[left2.X, left2.Y].Collision)
-                     {
-                        X = (left1.X + 1) * size;
-                        IsLeftMoving = false;
-                    }
+
+            var left1 = new Point((int)Math.Floor((double)dirX / size), (int)Math.Floor((double)Y / size));
+            var left2 = new Point((int)Math.Floor((double)dirX / size), (int)Math.Ceiling((double)Y / size));
+
+            var right1 = new Point((int)Math.Ceiling((double)dirX / size), (int)Math.Floor((double)Y / size));
+            var right2 = new Point((int)Math.Ceiling((double)dirX / size), (int)Math.Ceiling((double)Y / size));
+
+            if (dirX < 0
+                || dirX > (map.Width - 1) * size
+                || map.Level[left1.X, left1.Y].Collision
+                || map.Level[left2.X, left2.Y].Collision
+                || map.Level[right1.X, right1.Y].Collision
+                || map.Level[right2.X, right2.Y].Collision)
+                VelX = 0;
+            //if (dirX < 0)
+            //{
+            //    X = 0;
+            //    IsLeftMoving = false;
+            //}
+            //else
+            //{
+            //    var left1 = new Point((int)Math.Floor((double)dirX / size) - 1, (int)Math.Floor((double)Y / size));
+            //    var left2 = new Point((int)Math.Floor((double)dirX / size) - 1, (int)Math.Ceiling((double)Y / size));
+            //    if (left1.X >= 0)
+            //        if (map.Level[left1.X, left1.Y].Collision || map.Level[left2.X, left2.Y].Collision)
+            //         {
+            //            X = (left1.X + 1) * size;
+            //            IsLeftMoving = false;
+            //        }
 
 
 
-            }
+            //}
 
 
 
 
-            if (dirX > (map.Width - 1) * size)
-            {
-                X = (map.Width - 1) * size;
-                IsRightMoving = false;
-            }
-            var mapCellX = dirX / size;
+            //if (dirX > (map.Width - 1) * size)
+            //{
+            //    X = (map.Width - 1) * size;
+            //    IsRightMoving = false;
+            //}
+            //var mapCellX = dirX / size;
 
 
 
@@ -124,12 +138,13 @@ namespace Project_Jumper
             if (IsFalling)
                 Fall();
             var dirY = Y + VelY;
-            var plPos = new Point((int)Math.Round((double)X / size), (int)Math.Round((double)Y / size) - 1);
-            var plPosY = new Point((int)Math.Round((double)X / size), (int)Math.Round((double)dirY / size) - 1);
+            var plPos = new Point((int)Math.Round((double)X / size), (int)Math.Round((double)Y / size));
+            var plPosDirYFloor = new Point((int)Math.Round((double)X / size), (int)Math.Floor((double)dirY / size));
+            var plPosDirYCeiling = new Point((int)Math.Round((double)X / size), (int)Math.Ceiling((double)dirY / size));
 
-            if (dirY < size)
+            if (dirY < 0)
             {
-                Y = size;
+                Y = 0;
                 IsFalling = false;
                 IsJumping = false;
                 Jumped = false;
@@ -137,12 +152,12 @@ namespace Project_Jumper
             }
             else
             {
-                var down1 = new Point((int)Math.Floor((double)X / size), (int)Math.Floor((double)dirY / size) - 1);
-                var down2 = new Point((int)Math.Ceiling((double)X / size), (int)Math.Floor((double)dirY / size) - 1);
+                var down1 = new Point((int)Math.Floor((double)X / size), (int)Math.Floor((double)dirY / size));
+                var down2 = new Point((int)Math.Ceiling((double)X / size), (int)Math.Floor((double)dirY / size));
                 if (down1.Y >= 0)
                     if (map.Level[down1.X, down1.Y].Collision || map.Level[down2.X, down2.Y].Collision)
                     {
-                        Y = (down1.Y + 2) * size;
+                        Y = (down1.Y + 1) * size;
                         IsFalling = false;
                         IsJumping = false;
                         Jumped = false;
@@ -154,38 +169,35 @@ namespace Project_Jumper
                     }
             }
 
-            var upStuck = false;
-            if (dirY > map.Height * size)
+            var isUpStuck = false;
+            if (dirY > (map.Height - 1) * size)
             {
-                Y = map.Height * size;
+                Y = (map.Height - 1) * size;
                 IsFalling = false;
                 IsJumping = false;
-                Jumped = false;
                 FallStart = null;
-                upStuck = true;
+                isUpStuck = true;
             }
             else
             {
-                var up1 = new Point((int)Math.Floor((double)X / size), (int)Math.Ceiling((double)dirY / size) - 1);
-                var up2 = new Point((int)Math.Ceiling((double)X / size), (int)Math.Ceiling((double)dirY / size) - 1);
-                if (up1.Y < map.Height)
+                var up1 = new Point((int)Math.Floor((double)X / size), (int)Math.Ceiling((double)dirY / size));
+                var up2 = new Point((int)Math.Ceiling((double)X / size), (int)Math.Ceiling((double)dirY / size));
+                if (up1.Y < map.Height - 1)
                     if (map.Level[up1.X, up1.Y].Collision || map.Level[up2.X, up2.Y].Collision)
                     {
-                        Y = (up1.Y - 0) * size;
+                        Y = (up1.Y - 1) * size;
                         IsFalling = false;
                         IsJumping = false;
-                        Jumped = false;
                         FallStart = null;
-                        upStuck = true;
+                        isUpStuck = true;
                     }
-
             }
 
 
             if (!IsJumping && !IsFalling)
                 VelY = 0;
             Y += VelY;
-            if (upStuck) IsFalling = true;
+            if (isUpStuck) IsFalling = true;
         }
     }
 }

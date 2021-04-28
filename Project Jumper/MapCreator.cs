@@ -7,7 +7,9 @@ namespace Project_Jumper
     {
         public static MapCell[,] CreateMap(string map, string separator = "\r\n")
         {
-            var rows = map.Split(new[] { separator }, StringSplitOptions.RemoveEmptyEntries);
+            var rows = map.Split(new[] { separator }, StringSplitOptions.RemoveEmptyEntries)
+                .Reverse()
+                .ToArray();
             if (rows.Select(z => z.Length).Distinct().Count() != 1)
                 throw new Exception($"Wrong test map '{map}'");
             var result = new MapCell[rows[0].Length, rows.Length];
@@ -21,6 +23,7 @@ namespace Project_Jumper
             c switch
             {
                 'X' => new MapCell("Border", true, true),
+                'B' => new MapCell("Block", true, true),
                 _ => new MapCell("Space", true, false)
             };
     }

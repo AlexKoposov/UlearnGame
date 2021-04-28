@@ -11,7 +11,7 @@ namespace Project_Jumper
         public int Width => Level.GetLength(0);
         public int Height => Level.GetLength(1);
 
-        private const string emptyMap = @"
+        private const string startMap = @"
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 X                             X
 X                             X
@@ -20,36 +20,25 @@ X                             X
 X                             X
 X                             X
 X                             X
+X                     B       X
 X                             X
 X                             X
+X                   B         X
+X                             X
+X                B            X
+X            B                X
+X         B                   X
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
+
+        private const string highTest = @"
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 X                             X
 X                             X
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
 
-        public Map(int width, int height)
+        public Map()
         {
-            Level = new MapCell[width, height];
-            CreateSimpleLevel();
+            Level = MapCreator.CreateMap(startMap);
         }
-
-        void CreateSimpleLevel()
-        {
-            //for (var i = 0; i < Width; i++)
-            //    for (var j = 0; j < Height; j++)
-            //    {
-            //        if (i == 0
-            //            || j == 0
-            //            || i == Width - 1
-            //            || j == Height - 1)
-            //            Level[i, j] = new MapCell("Border", true, true);
-            //        else if (i % 6 == 0 && j % 4 == 0)
-            //            Level[i, j] = new MapCell("Block", true, true);
-            //        else Level[i, j] = new MapCell("Space", true, false);
-            //    }
-            //Level[6, 20] = new MapCell("Space", true, false);
-            Level = MapCreator.CreateMap(emptyMap);
-        }
-
-
     }
 }
