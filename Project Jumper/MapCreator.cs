@@ -24,6 +24,7 @@ namespace Project_Jumper
             {
                 'X' => new MapCell("Border", true, true),
                 'B' => new MapCell("Block", true, true),
+                'S' => new MapCell("Spike", false, true),
                 _ => new MapCell("Space", true, false)
             };
     }

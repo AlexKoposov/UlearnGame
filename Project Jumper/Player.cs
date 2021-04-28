@@ -22,6 +22,7 @@ namespace Project_Jumper
         public bool IsJumping { get; set; }
         public bool IsFalling { get; set; }
         public bool Jumped { get; set; }
+        public bool IsDead { get; set; }
         public DateTime? FallStart { get; set; }
 
 
@@ -96,38 +97,12 @@ namespace Project_Jumper
                 || map.Level[right1.X, right1.Y].Collision
                 || map.Level[right2.X, right2.Y].Collision)
                 VelX = 0;
-            //if (dirX < 0)
-            //{
-            //    X = 0;
-            //    IsLeftMoving = false;
-            //}
-            //else
-            //{
-            //    var left1 = new Point((int)Math.Floor((double)dirX / size) - 1, (int)Math.Floor((double)Y / size));
-            //    var left2 = new Point((int)Math.Floor((double)dirX / size) - 1, (int)Math.Ceiling((double)Y / size));
-            //    if (left1.X >= 0)
-            //        if (map.Level[left1.X, left1.Y].Collision || map.Level[left2.X, left2.Y].Collision)
-            //         {
-            //            X = (left1.X + 1) * size;
-            //            IsLeftMoving = false;
-            //        }
 
-
-
-            //}
-
-
-
-
-            //if (dirX > (map.Width - 1) * size)
-            //{
-            //    X = (map.Width - 1) * size;
-            //    IsRightMoving = false;
-            //}
-            //var mapCellX = dirX / size;
-
-
-
+            if (!map.Level[left1.X, left1.Y].IsFriendly
+                || !map.Level[left2.X, left2.Y].IsFriendly
+                || !map.Level[right1.X, right1.Y].IsFriendly
+                || !map.Level[right2.X, right2.Y].IsFriendly)
+                IsDead = true;
             X += VelX;
         }
 
@@ -162,6 +137,9 @@ namespace Project_Jumper
                         IsJumping = false;
                         Jumped = false;
                         FallStart = null;
+                        if (!map.Level[down1.X, down1.Y].IsFriendly
+                            || !map.Level[down2.X, down2.Y].IsFriendly)
+                            IsDead = true;
                     }
                     else
                     {
@@ -183,13 +161,17 @@ namespace Project_Jumper
                 var up1 = new Point((int)Math.Floor((double)X / size), (int)Math.Ceiling((double)dirY / size));
                 var up2 = new Point((int)Math.Ceiling((double)X / size), (int)Math.Ceiling((double)dirY / size));
                 if (up1.Y < map.Height - 1)
-                    if (map.Level[up1.X, up1.Y].Collision || map.Level[up2.X, up2.Y].Collision)
+                    if (map.Level[up1.X, up1.Y].Collision
+                        || map.Level[up2.X, up2.Y].Collision)
                     {
                         Y = (up1.Y - 1) * size;
                         IsFalling = false;
                         IsJumping = false;
                         FallStart = null;
                         isUpStuck = true;
+                        if (!map.Level[up1.X, up1.Y].IsFriendly
+                            || !map.Level[up2.X, up2.Y].IsFriendly)
+                            IsDead = true;
                     }
             }
 

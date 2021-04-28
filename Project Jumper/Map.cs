@@ -20,14 +20,14 @@ X                             X
 X                             X
 X                             X
 X                             X
+X                             X
+X                             X
+X                             X
 X                     B       X
-X                             X
-X                             X
-X                   B         X
-X                             X
-X                B            X
+X                  B          X
+X               B             X
 X            B                X
-X         B                   X
+X         B                SSSX
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
 
         private const string highTest = @"

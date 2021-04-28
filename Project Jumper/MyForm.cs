@@ -18,9 +18,7 @@ namespace Project_Jumper
         string currentPath;
         Player player;
         Map map;
-        Image playerSkin;
-        Image Border;
-        Image Block;
+        Image playerSkin, Border, Block, Spike;
 
         public MyForm()
         {
@@ -71,6 +69,7 @@ namespace Project_Jumper
             playerSkin = FitInSize(new Bitmap(Path.Combine(currentPath, "Resources\\Cube.png")));
             Border = FitInSize(new Bitmap(Path.Combine(currentPath, "Resources\\Border.png")));
             Block = FitInSize(new Bitmap(Path.Combine(currentPath, "Resources\\Block.png")));
+            Spike = FitInSize(new Bitmap(Path.Combine(currentPath, "Resources\\Spike.png")));
             map = new Map();
             gameTime.Start();
         }
@@ -85,7 +84,14 @@ namespace Project_Jumper
                 $" Up: ({Math.Floor((double)player.X / SizeValue)}, {Math.Ceiling((double)player.X / SizeValue)}; {Math.Ceiling((double)player.Y / SizeValue) + 1})" +
                 $" Left: ({Math.Ceiling((double)player.X / SizeValue) - 1}; {Math.Floor((double)player.Y / SizeValue)}, {Math.Ceiling((double)player.Y / SizeValue)})" +
                 $" Right: ({Math.Floor((double)player.X / SizeValue) + 1}; {Math.Floor((double)player.Y / SizeValue)}, {Math.Ceiling((double)player.Y / SizeValue)})";
+            if (player.IsDead)
+                Restart();
             Invalidate();
+        }
+
+        private void Restart()
+        {
+            player = new Player(300, 100);
         }
 
         private void OnPaint(object sender, PaintEventArgs e)
@@ -103,6 +109,8 @@ namespace Project_Jumper
                         g.DrawImage(Border, ConvertMathToWorld(i * SizeValue, j * SizeValue));
                     if (map.Level[i, j].Name == "Block")
                         g.DrawImage(Block, ConvertMathToWorld(i * SizeValue, j * SizeValue));
+                    if (map.Level[i, j].Name == "Spike")
+                        g.DrawImage(Spike, ConvertMathToWorld(i * SizeValue, j * SizeValue));
                 }
             g.DrawImage(playerSkin, ConvertMathToWorld(player.X, player.Y));
         }
