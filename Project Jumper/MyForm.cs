@@ -13,8 +13,8 @@ namespace Project_Jumper
 {
     public partial class MyForm : Form
     {
-        static readonly int SizeValue = 50;
-        static readonly Size BlockSize = new Size(new Point(SizeValue, SizeValue));
+        readonly int SizeValue;
+        readonly Size BlockSize;
         string currentPath;
         Player player;
         Map map;
@@ -29,6 +29,9 @@ namespace Project_Jumper
 
             KeyDown += new KeyEventHandler(OnPress);
             KeyUp += new KeyEventHandler(OnKeyUp);
+
+            SizeValue = Screen.FromControl(this).WorkingArea.Height / 20;
+            BlockSize = new Size(new Point(SizeValue, SizeValue));
 
             Initialise();
         }
@@ -65,12 +68,12 @@ namespace Project_Jumper
         void Initialise()
         {
             currentPath = new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName.ToString();
-            player = new Player(300, 100);
             playerSkin = FitInSize(new Bitmap(Path.Combine(currentPath, "Resources\\Cube.png")));
             Border = FitInSize(new Bitmap(Path.Combine(currentPath, "Resources\\Border.png")));
             Block = FitInSize(new Bitmap(Path.Combine(currentPath, "Resources\\Block.png")));
             Spike = FitInSize(new Bitmap(Path.Combine(currentPath, "Resources\\Spike.png")));
             map = new Map();
+            player = new Player(map.Width / 12 * SizeValue, map.Height / 12 * SizeValue, SizeValue);
             gameTime.Start();
         }
 
@@ -91,7 +94,7 @@ namespace Project_Jumper
 
         private void Restart()
         {
-            player = new Player(300, 100);
+            player = new Player(map.Width / 12 * SizeValue, map.Height / 12 * SizeValue, SizeValue);
         }
 
         private void OnPaint(object sender, PaintEventArgs e)

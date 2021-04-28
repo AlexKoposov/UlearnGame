@@ -7,7 +7,7 @@ namespace Project_Jumper
 {
     public class Player
     {
-        readonly int Velocity = 10;
+        private int Velocity { get; set; }
         private int Gravity { get; set; }
         public int X { get; private set; }
         public int Y { get; private set; }
@@ -26,11 +26,12 @@ namespace Project_Jumper
         public DateTime? FallStart { get; set; }
 
 
-        public Player(int x, int y, int gravity = 1)
+        public Player(int x, int y, int size, int gravity = 1)
         {
             X = x;
             Y = y;
             Gravity = gravity;
+            Velocity = size / 5;
             IsFalling = true;
         }
 
@@ -65,7 +66,7 @@ namespace Project_Jumper
             if (FallStart == null)
                 FallStart = DateTime.Now;
             var t = ((TimeSpan)(DateTime.Now - FallStart)).TotalSeconds;
-            VelY += Gravity * (int)(-10 * t);
+            VelY += Gravity * (int)(-Velocity * t);
         }
 
         public void SwitchGravity() =>
