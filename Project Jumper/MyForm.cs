@@ -81,8 +81,9 @@ namespace Project_Jumper
                 player.Move(map, SizeValue);
             Text = $"Position: X = {player.X}, Y = {player.Y}, " +
                 $"Map pos: ({Math.Round((double)player.X / SizeValue)}, {Math.Round((double)player.Y / SizeValue) - 1})" +
-                $"D: ({Math.Floor((double)player.X / SizeValue)}, {Math.Ceiling((double)player.X / SizeValue)}; {Math.Floor((double)player.Y / SizeValue) - 2})" +
-                $"D: ({Math.Floor((double)player.X / SizeValue)}, {Math.Ceiling((double)player.X / SizeValue)}; {Math.Ceiling((double)player.Y / SizeValue)})";
+                $" Down: ({Math.Floor((double)player.X / SizeValue)}, {Math.Ceiling((double)player.X / SizeValue)}; {Math.Floor((double)player.Y / SizeValue) - 2})" +
+                $" Up: ({Math.Floor((double)player.X / SizeValue)}, {Math.Ceiling((double)player.X / SizeValue)}; {Math.Ceiling((double)player.Y / SizeValue)})" +
+                $" Left: ({Math.Ceiling((double)player.X / SizeValue) - 1}; {Math.Floor((double)player.Y / SizeValue)}, {Math.Ceiling((double)player.Y / SizeValue)})";
             Invalidate();
         }
 
@@ -92,14 +93,14 @@ namespace Project_Jumper
             for (var i = 0; i < map.Width; i++)
                 for (var j = 0; j < map.Height; j++)
                 {
-                    if (map.Level[i, j].Name == "Border")
-                        g.DrawImage(Border, i * SizeValue, j * SizeValue);
-                    if (map.Level[i, j].Name == "Block")
-                        g.DrawImage(Block, i * SizeValue, j * SizeValue);
                     //if (map.Level[i, j].Name == "Border")
-                    //    g.DrawImage(Border, ConvertMathToWorld(i * SizeValue, j * SizeValue));
+                    //    g.DrawImage(Border, i * SizeValue, j * SizeValue);
                     //if (map.Level[i, j].Name == "Block")
-                    //    g.DrawImage(Block, ConvertMathToWorld(i * SizeValue, j * SizeValue));
+                    //    g.DrawImage(Block, i * SizeValue, j * SizeValue);
+                    if (map.Level[i, j].Name == "Border")
+                        g.DrawImage(Border, ConvertMathToWorld(i * SizeValue, (j + 1) * SizeValue));
+                    if (map.Level[i, j].Name == "Block")
+                        g.DrawImage(Block, ConvertMathToWorld(i * SizeValue, (j + 1) * SizeValue));
                 }
             g.DrawImage(playerSkin, ConvertMathToWorld(player.X, player.Y));
         }

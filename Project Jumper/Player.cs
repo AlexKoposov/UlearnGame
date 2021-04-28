@@ -21,6 +21,7 @@ namespace Project_Jumper
         public bool IsLeftMoving { get; set; }
         public bool IsJumping { get; set; }
         public bool IsFalling { get; set; }
+        public bool Jumped { get; set; }
         public DateTime? FallStart { get; set; }
 
 
@@ -53,7 +54,9 @@ namespace Project_Jumper
         public void Jump()
         {
             IsFalling = true;
-            VelY = Gravity * (int)(Velocity * 1.5);
+            if (!Jumped)
+                VelY = Gravity * (int)(Velocity * 1.5);
+            Jumped = true;
         }
 
         public void Fall()
@@ -61,7 +64,7 @@ namespace Project_Jumper
             if (FallStart == null)
                 FallStart = DateTime.Now;
             var t = ((TimeSpan)(DateTime.Now - FallStart)).TotalSeconds;
-            VelY += Gravity * (int)(-30 * t);
+            VelY += Gravity * (int)(-10 * t);
         }
 
         public void SwitchGravity() =>
@@ -90,7 +93,7 @@ namespace Project_Jumper
                 var left2 = new Point((int)Math.Floor((double)dirX / size) - 1, (int)Math.Ceiling((double)Y / size));
                 if (left1.X >= 0)
                     if (map.Level[left1.X, left1.Y].Collision || map.Level[left2.X, left2.Y].Collision)
-                    {
+                     {
                         X = (left1.X + 1) * size;
                         IsLeftMoving = false;
                     }
@@ -129,6 +132,7 @@ namespace Project_Jumper
                 Y = size;
                 IsFalling = false;
                 IsJumping = false;
+                Jumped = false;
                 FallStart = null;
             }
             else
@@ -141,6 +145,7 @@ namespace Project_Jumper
                         Y = (down1.Y + 2) * size;
                         IsFalling = false;
                         IsJumping = false;
+                        Jumped = false;
                         FallStart = null;
                     }
                     else
@@ -155,6 +160,7 @@ namespace Project_Jumper
                 Y = map.Height * size;
                 IsFalling = false;
                 IsJumping = false;
+                Jumped = false;
                 FallStart = null;
                 upStuck = true;
             }
@@ -168,6 +174,7 @@ namespace Project_Jumper
                         Y = (up1.Y - 0) * size;
                         IsFalling = false;
                         IsJumping = false;
+                        Jumped = false;
                         FallStart = null;
                         upStuck = true;
                     }
