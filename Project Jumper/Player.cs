@@ -24,7 +24,7 @@ namespace Project_Jumper
         public bool Jumped { get; set; }
         public bool IsDead { get; set; }
         public DateTime? FallStart { get; set; }
-
+        public DateTime? TriggerStart { get; set; }
 
         public Player(int x, int y, int size, int gravity = 1)
         {
@@ -35,10 +35,47 @@ namespace Project_Jumper
             IsFalling = true;
         }
 
+        public Player(Point startPos, int size, int gravity = 1)
+        {
+            X = startPos.X * size;
+            Y = startPos.Y * size;
+            Gravity = gravity;
+            Velocity = size / 5;
+            IsFalling = true;
+        }
+
         public void Move(Map map, int size)
         {
             ProcessCollisionX(map, size);
             ProcessCollisionY(map, size);
+        }
+
+        public void ReactToOrbs(Map map, int size)
+        {
+            if (TriggerStart != null)
+            {
+                if ((DateTime.Now - TriggerStart).Value.TotalMilliseconds <= 100)
+                {
+                    var positions = new HashSet<MapCell>
+                    {
+                        map.Level[(int)Math.Floor((double)X / size), (int)Math.Floor((double)Y / size)],
+                        map.Level[(int)Math.Floor((double)X / size), (int)Math.Ceiling((double)Y / size)],
+                        map.Level[(int)Math.Ceiling((double)X / size), (int)Math.Floor((double)Y / size)],
+                        map.Level[(int)Math.Ceiling((double)X / size), (int)Math.Ceiling((double)Y / size)]
+                    };
+                    foreach (var currentPos in positions)
+                        if (currentPos.IsOrb)
+                            switch (currentPos.Type)
+                            {
+                                case "JumpOrb":
+                                    Jumped = false;
+                                    FallStart = null;
+                                    TriggerStart = null;
+                                    Jump();
+                                    break;
+                            }
+                }
+            }
         }
 
         public void MoveRight()
@@ -74,8 +111,6 @@ namespace Project_Jumper
 
         private void ProcessCollisionX(Map map, int size)
         {
-            var plPos = new Point((int)Math.Round((double)X / size), (int)Math.Round((double)Y / size) - 1);
-
             if (!IsRightMoving && !IsLeftMoving)
                 VelX = 0;
             if (IsRightMoving && VelX < Velocity)
@@ -85,25 +120,46 @@ namespace Project_Jumper
 
             var dirX = X + VelX;
 
-            var left1 = new Point((int)Math.Floor((double)dirX / size), (int)Math.Floor((double)Y / size));
-            var left2 = new Point((int)Math.Floor((double)dirX / size), (int)Math.Ceiling((double)Y / size));
-
-            var right1 = new Point((int)Math.Ceiling((double)dirX / size), (int)Math.Floor((double)Y / size));
-            var right2 = new Point((int)Math.Ceiling((double)dirX / size), (int)Math.Ceiling((double)Y / size));
-
-            if (dirX < 0
-                || dirX > (map.Width - 1) * size
-                || map.Level[left1.X, left1.Y].Collision
-                || map.Level[left2.X, left2.Y].Collision
-                || map.Level[right1.X, right1.Y].Collision
-                || map.Level[right2.X, right2.Y].Collision)
+            if (dirX < 0)
+            {
+                X = 0;
                 VelX = 0;
+            }
+            else
+            {
+                var left1 = new Point((int)Math.Floor((double)dirX / size), (int)Math.Floor((double)Y / size));
+                var left2 = new Point((int)Math.Floor((double)dirX / size), (int)Math.Ceiling((double)Y / size));
+                if (map.Level[left1.X, left1.Y].Collision
+                    || map.Level[left2.X, left2.Y].Collision)
+                {
+                    X = (left1.X + 1) * size;
+                    VelX = 0;
+                }
+                if (!map.Level[left1.X, left1.Y].IsFriendly
+                    || !map.Level[left2.X, left2.Y].IsFriendly)
+                    IsDead = true;
+            }
 
-            if (!map.Level[left1.X, left1.Y].IsFriendly
-                || !map.Level[left2.X, left2.Y].IsFriendly
-                || !map.Level[right1.X, right1.Y].IsFriendly
-                || !map.Level[right2.X, right2.Y].IsFriendly)
-                IsDead = true;
+            if (dirX > (map.Width - 1) * size)
+            {
+                X = (map.Width - 1) * size;
+                VelX = 0;
+            }
+            else
+            {
+                var right1 = new Point((int)Math.Ceiling((double)dirX / size), (int)Math.Floor((double)Y / size));
+                var right2 = new Point((int)Math.Ceiling((double)dirX / size), (int)Math.Ceiling((double)Y / size));
+                if (map.Level[right1.X, right1.Y].Collision
+                    || map.Level[right2.X, right2.Y].Collision)
+                {
+                    X = (right1.X - 1) * size;
+                    VelX = 0;
+                }
+                if (!map.Level[right1.X, right1.Y].IsFriendly
+                    || !map.Level[right2.X, right2.Y].IsFriendly)
+                    IsDead = true;
+            }
+
             X += VelX;
         }
 
@@ -113,10 +169,8 @@ namespace Project_Jumper
                 Jump();
             if (IsFalling)
                 Fall();
+
             var dirY = Y + VelY;
-            var plPos = new Point((int)Math.Round((double)X / size), (int)Math.Round((double)Y / size));
-            var plPosDirYFloor = new Point((int)Math.Round((double)X / size), (int)Math.Floor((double)dirY / size));
-            var plPosDirYCeiling = new Point((int)Math.Round((double)X / size), (int)Math.Ceiling((double)dirY / size));
 
             if (dirY < 0)
             {
@@ -175,7 +229,6 @@ namespace Project_Jumper
                             IsDead = true;
                     }
             }
-
 
             if (!IsJumping && !IsFalling)
                 VelY = 0;

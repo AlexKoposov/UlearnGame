@@ -22,10 +22,13 @@ namespace Project_Jumper
         private static MapCell CreateMapCellBySymbol(char c) =>
             c switch
             {
-                'X' => new MapCell("Border", true, true),
-                'B' => new MapCell("Block", true, true),
-                'S' => new MapCell("Spike", false, true),
-                _ => new MapCell("Space", true, false)
+                'X' => new MapCell("Border", true, true, false),
+                'B' => new MapCell("Block", true, true, false),
+                'S' => new MapCell("Spike", false, true, false),
+                '*' => new MapCell("Saw", false, true, false),
+                'J' => new MapCell("JumpOrb", true, false, true),
+                'G' => new MapCell("GravityOrb", true, false, true),
+                _ => new MapCell("Space", true, false, false)
             };
     }
 }

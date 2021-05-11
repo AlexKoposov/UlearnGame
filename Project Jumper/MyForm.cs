@@ -18,7 +18,7 @@ namespace Project_Jumper
         string currentPath;
         Player player;
         Map map;
-        Image playerSkin, Border, Block, Spike;
+        Image playerSkin, border, block, spike, saw, jumpOrb, gravityOrb;
 
         public MyForm()
         {
@@ -30,7 +30,8 @@ namespace Project_Jumper
             KeyDown += new KeyEventHandler(OnPress);
             KeyUp += new KeyEventHandler(OnKeyUp);
 
-            SizeValue = Screen.FromControl(this).WorkingArea.Height / 20;
+            SizeValue = Screen.FromControl(this).WorkingArea.Height / 20 + 1;
+            //SizeValue = 53;
             BlockSize = new Size(new Point(SizeValue, SizeValue));
 
             Initialise();
@@ -62,6 +63,9 @@ namespace Project_Jumper
                 case Keys.Space:
                     player.IsJumping = true;
                     break;
+                case Keys.Up:
+                    player.TriggerStart = DateTime.Now;
+                    break;
             }
         }
 
@@ -69,32 +73,40 @@ namespace Project_Jumper
         {
             currentPath = new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName.ToString();
             playerSkin = FitInSize(new Bitmap(Path.Combine(currentPath, "Resources\\Cube.png")));
-            Border = FitInSize(new Bitmap(Path.Combine(currentPath, "Resources\\Border.png")));
-            Block = FitInSize(new Bitmap(Path.Combine(currentPath, "Resources\\Block.png")));
-            Spike = FitInSize(new Bitmap(Path.Combine(currentPath, "Resources\\Spike.png")));
+            border = FitInSize(new Bitmap(Path.Combine(currentPath, "Resources\\Border.png")));
+            block = FitInSize(new Bitmap(Path.Combine(currentPath, "Resources\\Block.png")));
+            spike = FitInSize(new Bitmap(Path.Combine(currentPath, "Resources\\Spike.png")));
+            saw = FitInSize(new Bitmap(Path.Combine(currentPath, "Resources\\Saw.png")));
+            jumpOrb = FitInSize(new Bitmap(Path.Combine(currentPath, "Resources\\Yellow_Orb.png")));
+            gravityOrb = FitInSize(new Bitmap(Path.Combine(currentPath, "Resources\\Blue_Orb.png")));
             map = new Map();
-            player = new Player(map.Width / 12 * SizeValue, map.Height / 12 * SizeValue, SizeValue);
+            player = new Player(map.startPos, SizeValue);
+
             gameTime.Start();
         }
 
         public void Update(object sender, EventArgs e)
         {
+            if (player.IsDead)
+                Restart();
+            if (player.TriggerStart != null)
+                player.ReactToOrbs(map, SizeValue);
             if (player.IsMoving)
                 player.Move(map, SizeValue);
+
             Text = $"Position: X = {player.X}, Y = {player.Y}, " +
-                $"Map pos: ({Math.Round((double)player.X / SizeValue)}, {Math.Round((double)player.Y / SizeValue)})" +
+                $"Map pos: ({Math.Round((double)player.X / SizeValue)}; {Math.Round((double)player.Y / SizeValue)})" +
                 $" Down: ({Math.Floor((double)player.X / SizeValue)}, {Math.Ceiling((double)player.X / SizeValue)}; {Math.Floor((double)player.Y / SizeValue) - 1})" +
                 $" Up: ({Math.Floor((double)player.X / SizeValue)}, {Math.Ceiling((double)player.X / SizeValue)}; {Math.Ceiling((double)player.Y / SizeValue) + 1})" +
                 $" Left: ({Math.Ceiling((double)player.X / SizeValue) - 1}; {Math.Floor((double)player.Y / SizeValue)}, {Math.Ceiling((double)player.Y / SizeValue)})" +
                 $" Right: ({Math.Floor((double)player.X / SizeValue) + 1}; {Math.Floor((double)player.Y / SizeValue)}, {Math.Ceiling((double)player.Y / SizeValue)})";
-            if (player.IsDead)
-                Restart();
+
             Invalidate();
         }
 
         private void Restart()
         {
-            player = new Player(map.Width / 12 * SizeValue, map.Height / 12 * SizeValue, SizeValue);
+            player = new Player(map.startPos, SizeValue);
         }
 
         private void OnPaint(object sender, PaintEventArgs e)
@@ -107,14 +119,27 @@ namespace Project_Jumper
         {
             for (var i = 0; i < map.Width; i++)
                 for (var j = 0; j < map.Height; j++)
-                {
-                    if (map.Level[i, j].Name == "Border")
-                        g.DrawImage(Border, ConvertMathToWorld(i * SizeValue, j * SizeValue));
-                    if (map.Level[i, j].Name == "Block")
-                        g.DrawImage(Block, ConvertMathToWorld(i * SizeValue, j * SizeValue));
-                    if (map.Level[i, j].Name == "Spike")
-                        g.DrawImage(Spike, ConvertMathToWorld(i * SizeValue, j * SizeValue));
-                }
+                    switch (map.Level[i, j].Type)
+                    {
+                        case "Border":
+                            g.DrawImage(border, ConvertMathToWorld(i * SizeValue, j * SizeValue));
+                            break;
+                        case "Block":
+                            g.DrawImage(block, ConvertMathToWorld(i * SizeValue, j * SizeValue));
+                            break;
+                        case "Spike":
+                            g.DrawImage(spike, ConvertMathToWorld(i * SizeValue, j * SizeValue));
+                            break;
+                        case "Saw":
+                            g.DrawImage(saw, ConvertMathToWorld(i * SizeValue, j * SizeValue));
+                            break;
+                        case "JumpOrb":
+                            g.DrawImage(jumpOrb, ConvertMathToWorld(i * SizeValue, j * SizeValue));
+                            break;
+                        case "GravityOrb":
+                            g.DrawImage(gravityOrb, ConvertMathToWorld(i * SizeValue, j * SizeValue));
+                            break;
+                    }
             g.DrawImage(playerSkin, ConvertMathToWorld(player.X, player.Y));
         }
 
