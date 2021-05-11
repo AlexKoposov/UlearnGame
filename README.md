@@ -8,9 +8,8 @@
 Присутствуют **сферы**, на которые можно нажимать и получать разные **эффекты**.
 
 **Из эффектов:**
-- Прыжки разной высоты.
+- Дополнительный прыжок.
 - Смена гравитации.
-- Резкий рывок вниз.
 
 Присутствуют **порталы**, меняющие **режим игры**.
 
@@ -21,14 +20,14 @@
 
 # Screenshots
 
-**21.04.2021**
+**12.05.2021**
 
-![alt text](https://github.com/AlexKoposov/UlearnGame/blob/main/Screenshots/21.04.2021.png?raw=true)
+![alt text](https://github.com/AlexKoposov/UlearnGame/blob/main/Screenshots/12.05.2021.png?raw=true)
 
 **28.04.2021**
 
 ![alt text](https://github.com/AlexKoposov/UlearnGame/blob/main/Screenshots/28.04.2021.png?raw=true)
 
-**12.05.2021**
+**21.04.2021**
 
-![alt text](https://github.com/AlexKoposov/UlearnGame/blob/main/Screenshots/12.05.2021.png?raw=true)
+![alt text](https://github.com/AlexKoposov/UlearnGame/blob/main/Screenshots/21.04.2021.png?raw=true)
