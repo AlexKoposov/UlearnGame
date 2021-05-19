@@ -65,7 +65,7 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
 
         public Map()
         {
-            startPos = new Point(1, 17);
+            startPos = new Point(1, 1);
             Level = MapCreator.CreateMap(level1);
         }
     }
