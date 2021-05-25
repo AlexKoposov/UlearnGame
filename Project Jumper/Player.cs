@@ -47,7 +47,7 @@ namespace Project_Jumper
         {
             Gravity = gravity;
             Velocity = size / 6;
-            MaxYVel = size / 2;
+            MaxYVel = size / 4;
             IsFalling = true;
         }
 
@@ -84,9 +84,10 @@ namespace Project_Jumper
                                 FallTicks = 0;
                                 Jump();
                                 break;
-                                //case "GravityOrb":
-                                //    ChangeGravity();
-                                //    break;
+                            case "GravityOrb":
+                                ChangeGravity();
+                                FallTicks = 15;
+                                break;
                         }
             }
         }
@@ -109,16 +110,12 @@ namespace Project_Jumper
             if (!Jumped)
                 VelY = Gravity * (int)(Velocity * 1.25);
             Jumped = true;
-            if (VelY > MaxYVel)
-                VelY = MaxYVel;
         }
 
         public void Fall()
         {
             var k = FallTicks++ * 0.01;
             VelY += Gravity * (int)(-Velocity * k);
-            if (VelY < -MaxYVel)
-                VelY = -MaxYVel;
         }
 
         public void ChangeGravity() =>
@@ -174,6 +171,83 @@ namespace Project_Jumper
             X += VelX;
         }
 
+        private void ProcessCollisionY(Map map, int size)
+        {
+            if (IsJumping) Jump();
+            if (IsFalling) Fall();
+            if (VelY > MaxYVel)
+                VelY = MaxYVel;
+            else if (VelY < -MaxYVel)
+                VelY = -MaxYVel;
+            var dirY = Y + VelY;
+            var isUpStuck = false;
+
+            if (dirY < 0)
+            {
+                Y = 0;
+                if (Gravity == 1) ApplyLanding();
+                else isUpStuck = ApplyUpStuck();
+            }
+            else
+            {
+                var down1 = new Point((int)Math.Floor((double)X / size), (int)Math.Floor((double)dirY / size));
+                var down2 = new Point((int)Math.Ceiling((double)X / size), (int)Math.Floor((double)dirY / size));
+                if (down1.Y >= 0)
+                    if (map.Level[down1.X, down1.Y].Collision || map.Level[down2.X, down2.Y].Collision)
+                    {
+                        Y = (down1.Y + 1) * size;
+                        if (Gravity == 1) ApplyLanding();
+                        else isUpStuck = ApplyUpStuck();
+                        CheckFriendlyness(map, down1, down2);
+                        CheckLevelCompletion(map, down1, down2);
+                    }
+                    else
+                    {
+                        IsFalling = true;
+                    }
+            }
+
+            if (dirY > (map.Height - 1) * size)
+            {
+                Y = (map.Height - 1) * size;
+                if (Gravity == 1) isUpStuck = ApplyUpStuck();
+                else ApplyLanding();
+            }
+            else
+            {
+                var up1 = new Point((int)Math.Floor((double)X / size), (int)Math.Ceiling((double)dirY / size));
+                var up2 = new Point((int)Math.Ceiling((double)X / size), (int)Math.Ceiling((double)dirY / size));
+                if (up1.Y <= map.Height - 1)
+                    if (map.Level[up1.X, up1.Y].Collision
+                        || map.Level[up2.X, up2.Y].Collision)
+                    {
+                        Y = (up1.Y - 1) * size;
+                        if (Gravity == 1) isUpStuck = ApplyUpStuck();
+                        else ApplyLanding();
+                        CheckFriendlyness(map, up1, up2);
+                        CheckLevelCompletion(map, up1, up2);
+                    }
+            }
+
+            if (!IsJumping && !IsFalling) VelY = 0;
+            Y += VelY;
+            if (isUpStuck) IsFalling = true;
+        }
+
+        private bool ApplyUpStuck()
+        {
+            bool isUpStuck;
+            StopJumping();
+            isUpStuck = true;
+            return isUpStuck;
+        }
+
+        private void ApplyLanding()
+        {
+            StopJumping();
+            Jumped = false;
+        }
+
         private static bool CheckCollision(Map map, Point p1, Point p2)
         {
             return map.Level[p1.X, p1.Y].Collision
@@ -192,65 +266,6 @@ namespace Project_Jumper
             if (!IsDead)
                 IsDead = !map.Level[p1.X, p1.Y].IsFriendly
                       || !map.Level[p2.X, p2.Y].IsFriendly;
-        }
-
-        private void ProcessCollisionY(Map map, int size)
-        {
-            if (IsJumping) Jump();
-            if (IsFalling) Fall();
-            var dirY = Y + VelY;
-
-            if (dirY < 0)
-            {
-                Y = 0;
-                StopJumping();
-                Jumped = false;
-            }
-            else
-            {
-                var down1 = new Point((int)Math.Floor((double)X / size), (int)Math.Floor((double)dirY / size));
-                var down2 = new Point((int)Math.Ceiling((double)X / size), (int)Math.Floor((double)dirY / size));
-                if (down1.Y >= 0)
-                    if (map.Level[down1.X, down1.Y].Collision || map.Level[down2.X, down2.Y].Collision)
-                    {
-                        Y = (down1.Y + 1) * size;
-                        StopJumping();
-                        Jumped = false;
-                        CheckFriendlyness(map, down1, down2);
-                        CheckLevelCompletion(map, down1, down2);
-                    }
-                    else
-                    {
-                        IsFalling = true;
-                    }
-            }
-
-            var isUpStuck = false;
-            if (dirY > (map.Height - 1) * size)
-            {
-                Y = (map.Height - 1) * size;
-                StopJumping();
-                isUpStuck = true;
-            }
-            else
-            {
-                var up1 = new Point((int)Math.Floor((double)X / size), (int)Math.Ceiling((double)dirY / size));
-                var up2 = new Point((int)Math.Ceiling((double)X / size), (int)Math.Ceiling((double)dirY / size));
-                if (up1.Y <= map.Height - 1)
-                    if (map.Level[up1.X, up1.Y].Collision
-                        || map.Level[up2.X, up2.Y].Collision)
-                    {
-                        Y = (up1.Y - 1) * size;
-                        StopJumping();
-                        isUpStuck = true;
-                        CheckFriendlyness(map, up1, up2);
-                        CheckLevelCompletion(map, up1, up2);
-                    }
-            }
-
-            if (!IsJumping && !IsFalling) VelY = 0;
-            Y += VelY;
-            if (isUpStuck) IsFalling = true;
         }
 
         private void StopJumping()

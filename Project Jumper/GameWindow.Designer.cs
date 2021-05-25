@@ -1,7 +1,7 @@
 ﻿
 namespace Project_Jumper
 {
-    partial class MyForm
+    partial class GameWindow
     {
         /// <summary>
         ///  Required designer variable.

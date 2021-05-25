@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
+﻿using System.Drawing;
 
 namespace Project_Jumper
 {
@@ -19,7 +15,7 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 X                                   X
 X                                   X
 X                                   X
-X                                   X
+X                   G               X
 X                                   X
 X                                   X
 X                                   X
@@ -63,7 +59,7 @@ XFFFF                               X
 XBBBB                               X
 X       J                           X
 X    *         J                    X
-X       *  *                        X
+X       *  B                        X
 X             *  * BBB              X
 X                         J         X
 X                        * *        X

@@ -1,19 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Project_Jumper
 {
-    public partial class MyForm : Form
+    public partial class GameWindow : Form
     {
         Rectangle screen;
         readonly int SizeValue;
@@ -22,8 +14,9 @@ namespace Project_Jumper
         Player player;
         Map map;
         Image playerSkin, border, block, spike, saw, jumpOrb, gravityOrb, finish, timerBackground;
+        int degrees;
 
-        public MyForm()
+        public GameWindow()
         {
             InitializeComponent();
             screen = Screen.FromControl(this).WorkingArea;
@@ -105,6 +98,7 @@ namespace Project_Jumper
 
         public void Update(object sender, EventArgs e)
         {
+            degrees += 4;
             player.TriggerTicks++;
             if (player.IsLevelCompleted && !player.IsMessageShowed)
             {
@@ -178,8 +172,7 @@ namespace Project_Jumper
                             DrawElement(spike, g, i, j);
                             break;
                         case "Saw":
-                            saw.RotateFlip(RotateFlipType.Rotate90FlipNone);
-                            DrawElement(saw, g, i, j);
+                            DrawElement(RotateImage(saw, degrees), g, i, j);
                             break;
                         case "JumpOrb":
                             DrawElement(jumpOrb, g, i, j);
@@ -192,6 +185,20 @@ namespace Project_Jumper
                             break;
                     }
             g.DrawImage(playerSkin, ConvertMathToWorld(player.X, player.Y));
+        }
+
+        public static Bitmap RotateImage(Image image, float angle)
+        {
+            if (image == null) throw new ArgumentNullException();
+            PointF offset = new PointF((float)image.Width / 2, (float)image.Height / 2);
+            Bitmap rotatedBmp = new Bitmap(image.Width, image.Height);
+            rotatedBmp.SetResolution(image.HorizontalResolution, image.VerticalResolution);
+            Graphics g = Graphics.FromImage(rotatedBmp);
+            g.TranslateTransform(offset.X, offset.Y);
+            g.RotateTransform(angle);
+            g.TranslateTransform(-offset.X, -offset.Y);
+            g.DrawImage(image, new PointF(0, 0));
+            return rotatedBmp;
         }
 
         private void DrawElement(Image e, Graphics g, int i, int j)
