@@ -86,7 +86,6 @@ namespace Project_Jumper
                                 break;
                             case "GravityOrb":
                                 ChangeGravity();
-                                FallTicks = 15;
                                 break;
                         }
             }

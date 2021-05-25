@@ -73,6 +73,28 @@ X   B  B  B         B               X
 X   BSSBSSBSSSSSSSSSBSSSSSSSSSSSSSSSX
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
 
+        private const string level2 = @"
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+XFFB   *                            X
+X  B  *                             X
+X  B *                              X
+X  B*           BBB    J            X
+X  B            B          BB       X
+X               B * * *             X
+X         B * * B                BBBX
+X   G     B                  J      X
+X         B        G                X
+X         BSSSSSS                   X
+X * * * * BBBBBBB     BBBBB      *  X
+X               B     B             X
+X               B     B     *       X
+X                     B          *  X
+X      B  G           B             X
+X      B                    *       X
+X   B  B                            X
+X   BSSBSSSSSSSSSSSSSSSSSSSSSSSSSSSSX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
+
         public void IncreaseTime()
         {
             LevelTimeSeconds++;
@@ -81,7 +103,7 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
         public Map()
         {
             Start = new Point(1, 1);
-            Level = MapCreator.CreateMap(playground);
+            Level = MapCreator.CreateMap(level2);
         }
     }
 }
