@@ -21,7 +21,7 @@ namespace Project_Jumper
         string currentPath;
         Player player;
         Map map;
-        Image playerSkin, border, block, spike, saw, jumpOrb, gravityOrb, finish;
+        Image playerSkin, border, block, spike, saw, jumpOrb, gravityOrb, finish, timerBackground;
 
         public MyForm()
         {
@@ -91,6 +91,7 @@ namespace Project_Jumper
             GetSprite(ref jumpOrb, "Yellow_Orb");
             GetSprite(ref gravityOrb, "Blue_Orb");
             GetSprite(ref finish, "Finish");
+            GetSprite(ref timerBackground, "Timer_Background");
             map = new Map();
             player = new Player(map.Start, SizeValue);
             GameTime.Start();
@@ -125,11 +126,17 @@ namespace Project_Jumper
             //    $" Up: ({Math.Floor((double)player.X / SizeValue)}, {Math.Ceiling((double)player.X / SizeValue)}; {Math.Ceiling((double)player.Y / SizeValue) + 1})" +
             //    $" Left: ({Math.Ceiling((double)player.X / SizeValue) - 1}; {Math.Floor((double)player.Y / SizeValue)}, {Math.Ceiling((double)player.Y / SizeValue)})" +
             //    $" Right: ({Math.Floor((double)player.X / SizeValue) + 1}; {Math.Floor((double)player.Y / SizeValue)}, {Math.Ceiling((double)player.Y / SizeValue)})";
-            
+
+            UpdateTimeLabel();
+            Invalidate();
+        }
+
+        private void UpdateTimeLabel()
+        {
             var time = map.LevelTimeSeconds;
             TimeLabel.Text = $"{time / 60}:{string.Format("{0:00}", time % 60)}".ToString();
-            TimeLabel.Location = new Point(screen.Width - TimeLabel.Size.Width, 0);
-            Invalidate();
+            TimeLabel.Location = new Point(screen.Width - TimeLabel.Size.Width + 1, 0);
+            TimeLabel.Image = new Bitmap(timerBackground, TimeLabel.Size);
         }
 
         private void LevelTime_Tick(object sender, EventArgs e)
