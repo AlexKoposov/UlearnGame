@@ -33,7 +33,7 @@ namespace Project_Jumper
             this.gameTime = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
             // 
-            // timer1
+            // gameTime
             // 
             this.gameTime.Enabled = true;
             // 
@@ -53,6 +53,7 @@ namespace Project_Jumper
             this.Load += new System.EventHandler(this.Update);
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.OnPaint);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnPress);
+            this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnMouseClick);
             this.ResumeLayout(false);
 
         }

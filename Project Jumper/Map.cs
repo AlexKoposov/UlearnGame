@@ -11,7 +11,7 @@ namespace Project_Jumper
         public MapCell[,] Level { get; private set; }
         public int Width => Level.GetLength(0);
         public int Height => Level.GetLength(1);
-        public readonly Point startPos;
+        public readonly Point Start;
 
         private const string playground = @"
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -27,9 +27,9 @@ X                                   X
 X                   G               X
 X                                   X
 X             J           J         X
-X                                   X
-X   *                 B             X
-X   *              B                X
+X       F                           X
+X   *   F             B             X
+X   *   F          B                X
 X   *           B                   X
 X            B                      X
 X         B           G       J  SSSX
@@ -41,12 +41,25 @@ X                             X
 X                             X
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
 
+        private const string jumpTest = @"
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+X                                     X
+X                                     X
+X                                     X
+X                                     X
+X                                     X
+X                                     X
+X                                     X
+X                                     X
+X                                     X
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
+
         private const string level1 = @"
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-X                                   X
-X                                   X
-X                                   X
-XBBB                                X
+XFFFF                               X
+XFFFF                               X
+XFFFF                               X
+XBBBB                               X
 X       J                           X
 X    *         J                    X
 X       *  *                        X
@@ -65,8 +78,8 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
 
         public Map()
         {
-            startPos = new Point(1, 1);
-            Level = MapCreator.CreateMap(level1);
+            Start = new Point(1, 1);
+            Level = MapCreator.CreateMap(playground);
         }
     }
 }

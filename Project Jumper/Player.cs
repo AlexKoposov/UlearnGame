@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.IO;
 
 namespace Project_Jumper
 {
     public class Player
     {
         private int Velocity { get; set; }
+        private int MaxYVel { get; set; }
         private int Gravity { get; set; }
         public int X { get; private set; }
         public int Y { get; private set; }
@@ -23,24 +23,31 @@ namespace Project_Jumper
         public bool IsFalling { get; set; }
         public bool Jumped { get; set; }
         public bool IsDead { get; set; }
-        public DateTime? FallStart { get; set; }
-        public DateTime? TriggerStart { get; set; }
+        public bool IsLevelCompleted { get; set; }
+        public bool IsMessageShowed { get; set; }
+        public int FallTicks { get; set; }
+        public int TriggerTicks { get; set; }
+
 
         public Player(int x, int y, int size, int gravity = 1)
         {
             X = x;
             Y = y;
-            Gravity = gravity;
-            Velocity = size / 5;
-            IsFalling = true;
+            ApplyDefaultConditions(size, gravity);
         }
 
         public Player(Point startPos, int size, int gravity = 1)
         {
             X = startPos.X * size;
             Y = startPos.Y * size;
+            ApplyDefaultConditions(size, gravity);
+        }
+
+        private void ApplyDefaultConditions(int size, int gravity)
+        {
             Gravity = gravity;
-            Velocity = size / 5;
+            Velocity = size / 6;
+            MaxYVel = size / 2;
             IsFalling = true;
         }
 
@@ -50,31 +57,37 @@ namespace Project_Jumper
             ProcessCollisionY(map, size);
         }
 
+        public void Stop()
+        {
+            IsLeftMoving = false;
+            IsRightMoving = false;
+            StopJumping();
+        }
+
         public void ReactToOrbs(Map map, int size)
         {
-            if (TriggerStart != null)
+            if (TriggerTicks != 0 && TriggerTicks <= 15)
             {
-                if ((DateTime.Now - TriggerStart).Value.TotalMilliseconds <= 100)
+                var positions = new HashSet<MapCell>
                 {
-                    var positions = new HashSet<MapCell>
-                    {
-                        map.Level[(int)Math.Floor((double)X / size), (int)Math.Floor((double)Y / size)],
-                        map.Level[(int)Math.Floor((double)X / size), (int)Math.Ceiling((double)Y / size)],
-                        map.Level[(int)Math.Ceiling((double)X / size), (int)Math.Floor((double)Y / size)],
-                        map.Level[(int)Math.Ceiling((double)X / size), (int)Math.Ceiling((double)Y / size)]
-                    };
-                    foreach (var currentPos in positions)
-                        if (currentPos.IsOrb)
-                            switch (currentPos.Type)
-                            {
-                                case "JumpOrb":
-                                    Jumped = false;
-                                    FallStart = null;
-                                    TriggerStart = null;
-                                    Jump();
-                                    break;
-                            }
-                }
+                    map.Level[(int)Math.Floor((double)X / size), (int)Math.Floor((double)Y / size)],
+                    map.Level[(int)Math.Floor((double)X / size), (int)Math.Ceiling((double)Y / size)],
+                    map.Level[(int)Math.Ceiling((double)X / size), (int)Math.Floor((double)Y / size)],
+                    map.Level[(int)Math.Ceiling((double)X / size), (int)Math.Ceiling((double)Y / size)]
+                };
+                foreach (var currentPos in positions)
+                    if (currentPos.IsOrb)
+                        switch (currentPos.Type)
+                        {
+                            case "JumpOrb":
+                                Jumped = false;
+                                FallTicks = 0;
+                                Jump();
+                                break;
+                                //case "GravityOrb":
+                                //    ChangeGravity();
+                                //    break;
+                        }
             }
         }
 
@@ -94,19 +107,21 @@ namespace Project_Jumper
         {
             IsFalling = true;
             if (!Jumped)
-                VelY = Gravity * (int)(Velocity * 1.5);
+                VelY = Gravity * (int)(Velocity * 1.25);
             Jumped = true;
+            if (VelY > MaxYVel)
+                VelY = MaxYVel;
         }
 
         public void Fall()
         {
-            if (FallStart == null)
-                FallStart = DateTime.Now;
-            var t = ((TimeSpan)(DateTime.Now - FallStart)).TotalSeconds;
-            VelY += Gravity * (int)(-Velocity * t);
+            var k = FallTicks++ * 0.01;
+            VelY += Gravity * (int)(-Velocity * k);
+            if (VelY < -MaxYVel)
+                VelY = -MaxYVel;
         }
 
-        public void SwitchGravity() =>
+        public void ChangeGravity() =>
             Gravity = Gravity == 1 ? -1 : 1;
 
         private void ProcessCollisionX(Map map, int size)
@@ -129,15 +144,13 @@ namespace Project_Jumper
             {
                 var left1 = new Point((int)Math.Floor((double)dirX / size), (int)Math.Floor((double)Y / size));
                 var left2 = new Point((int)Math.Floor((double)dirX / size), (int)Math.Ceiling((double)Y / size));
-                if (map.Level[left1.X, left1.Y].Collision
-                    || map.Level[left2.X, left2.Y].Collision)
+                if (CheckCollision(map, left1, left2))
                 {
                     X = (left1.X + 1) * size;
                     VelX = 0;
                 }
-                if (!map.Level[left1.X, left1.Y].IsFriendly
-                    || !map.Level[left2.X, left2.Y].IsFriendly)
-                    IsDead = true;
+                CheckFriendlyness(map, left1, left2);
+                CheckLevelCompletion(map, left1, left2);
             }
 
             if (dirX > (map.Width - 1) * size)
@@ -149,36 +162,49 @@ namespace Project_Jumper
             {
                 var right1 = new Point((int)Math.Ceiling((double)dirX / size), (int)Math.Floor((double)Y / size));
                 var right2 = new Point((int)Math.Ceiling((double)dirX / size), (int)Math.Ceiling((double)Y / size));
-                if (map.Level[right1.X, right1.Y].Collision
-                    || map.Level[right2.X, right2.Y].Collision)
+                if (CheckCollision(map, right1, right2))
                 {
                     X = (right1.X - 1) * size;
                     VelX = 0;
                 }
-                if (!map.Level[right1.X, right1.Y].IsFriendly
-                    || !map.Level[right2.X, right2.Y].IsFriendly)
-                    IsDead = true;
+                CheckFriendlyness(map, right1, right2);
+                CheckLevelCompletion(map, right1, right2);
             }
 
             X += VelX;
         }
 
+        private static bool CheckCollision(Map map, Point p1, Point p2)
+        {
+            return map.Level[p1.X, p1.Y].Collision
+                || map.Level[p2.X, p2.Y].Collision;
+        }
+
+        private void CheckLevelCompletion(Map map, Point p1, Point p2)
+        {
+            if (!IsLevelCompleted)
+                IsLevelCompleted = map.Level[p1.X, p1.Y].Type == "Finish"
+                                || map.Level[p2.X, p2.Y].Type == "Finish";
+        }
+
+        private void CheckFriendlyness(Map map, Point p1, Point p2)
+        {
+            if (!IsDead)
+                IsDead = !map.Level[p1.X, p1.Y].IsFriendly
+                      || !map.Level[p2.X, p2.Y].IsFriendly;
+        }
+
         private void ProcessCollisionY(Map map, int size)
         {
-            if (IsJumping)
-                Jump();
-            if (IsFalling)
-                Fall();
-
+            if (IsJumping) Jump();
+            if (IsFalling) Fall();
             var dirY = Y + VelY;
 
             if (dirY < 0)
             {
                 Y = 0;
-                IsFalling = false;
-                IsJumping = false;
+                StopJumping();
                 Jumped = false;
-                FallStart = null;
             }
             else
             {
@@ -188,13 +214,10 @@ namespace Project_Jumper
                     if (map.Level[down1.X, down1.Y].Collision || map.Level[down2.X, down2.Y].Collision)
                     {
                         Y = (down1.Y + 1) * size;
-                        IsFalling = false;
-                        IsJumping = false;
+                        StopJumping();
                         Jumped = false;
-                        FallStart = null;
-                        if (!map.Level[down1.X, down1.Y].IsFriendly
-                            || !map.Level[down2.X, down2.Y].IsFriendly)
-                            IsDead = true;
+                        CheckFriendlyness(map, down1, down2);
+                        CheckLevelCompletion(map, down1, down2);
                     }
                     else
                     {
@@ -206,34 +229,35 @@ namespace Project_Jumper
             if (dirY > (map.Height - 1) * size)
             {
                 Y = (map.Height - 1) * size;
-                IsFalling = false;
-                IsJumping = false;
-                FallStart = null;
+                StopJumping();
                 isUpStuck = true;
             }
             else
             {
                 var up1 = new Point((int)Math.Floor((double)X / size), (int)Math.Ceiling((double)dirY / size));
                 var up2 = new Point((int)Math.Ceiling((double)X / size), (int)Math.Ceiling((double)dirY / size));
-                if (up1.Y < map.Height - 1)
+                if (up1.Y <= map.Height - 1)
                     if (map.Level[up1.X, up1.Y].Collision
                         || map.Level[up2.X, up2.Y].Collision)
                     {
                         Y = (up1.Y - 1) * size;
-                        IsFalling = false;
-                        IsJumping = false;
-                        FallStart = null;
+                        StopJumping();
                         isUpStuck = true;
-                        if (!map.Level[up1.X, up1.Y].IsFriendly
-                            || !map.Level[up2.X, up2.Y].IsFriendly)
-                            IsDead = true;
+                        CheckFriendlyness(map, up1, up2);
+                        CheckLevelCompletion(map, up1, up2);
                     }
             }
 
-            if (!IsJumping && !IsFalling)
-                VelY = 0;
+            if (!IsJumping && !IsFalling) VelY = 0;
             Y += VelY;
             if (isUpStuck) IsFalling = true;
+        }
+
+        private void StopJumping()
+        {
+            IsFalling = false;
+            IsJumping = false;
+            FallTicks = 0;
         }
     }
 }
