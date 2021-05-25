@@ -20,6 +20,10 @@
 
 # Screenshots
 
+**19.05.2021**
+
+![alt text](https://github.com/AlexKoposov/UlearnGame/blob/main/Screenshots/19.05.2021.png?raw=true)
+
 **12.05.2021**
 
 ![alt text](https://github.com/AlexKoposov/UlearnGame/blob/main/Screenshots/12.05.2021.png?raw=true)
