@@ -15,6 +15,7 @@ namespace Project_Jumper
 {
     public partial class MyForm : Form
     {
+        Rectangle screen;
         readonly int SizeValue;
         readonly Size BlockSize;
         string currentPath;
@@ -25,9 +26,10 @@ namespace Project_Jumper
         public MyForm()
         {
             InitializeComponent();
+            screen = Screen.FromControl(this).WorkingArea;
 
-            gameTime.Interval = 10;
-            gameTime.Tick += new EventHandler(Update);
+            GameTime.Interval = 10;
+            GameTime.Tick += new EventHandler(Update);
 
             KeyDown += new KeyEventHandler(OnPress);
             KeyUp += new KeyEventHandler(OnKeyUp);
@@ -91,7 +93,8 @@ namespace Project_Jumper
             GetSprite(ref finish, "Finish");
             map = new Map();
             player = new Player(map.Start, SizeValue);
-            gameTime.Start();
+            GameTime.Start();
+            LevelTime.Start();
         }
 
         private void GetSprite(ref Image inGameSprite, string spriteName)
@@ -106,7 +109,8 @@ namespace Project_Jumper
             {
                 player.IsMessageShowed = true;
                 player.Stop();
-                ThrowMessage();
+                LevelTime.Stop();
+                ShowMessage();
             }
             if (player.IsDead)
                 Restart();
@@ -121,13 +125,23 @@ namespace Project_Jumper
             //    $" Up: ({Math.Floor((double)player.X / SizeValue)}, {Math.Ceiling((double)player.X / SizeValue)}; {Math.Ceiling((double)player.Y / SizeValue) + 1})" +
             //    $" Left: ({Math.Ceiling((double)player.X / SizeValue) - 1}; {Math.Floor((double)player.Y / SizeValue)}, {Math.Ceiling((double)player.Y / SizeValue)})" +
             //    $" Right: ({Math.Floor((double)player.X / SizeValue) + 1}; {Math.Floor((double)player.Y / SizeValue)}, {Math.Ceiling((double)player.Y / SizeValue)})";
-
+            
+            var time = map.LevelTimeSeconds;
+            TimeLabel.Text = $"{time / 60}:{string.Format("{0:00}", time % 60)}".ToString();
+            TimeLabel.Location = new Point(screen.Width - TimeLabel.Size.Width, 0);
             Invalidate();
         }
 
-        private void ThrowMessage()
+        private void LevelTime_Tick(object sender, EventArgs e)
         {
-            MessageBox.Show("Вы победили!");
+            map.IncreaseTime();
+        }
+
+        private void ShowMessage()
+        {
+            var time = map.LevelTimeSeconds;
+            MessageBox.Show(@$"Вы победили!
+Ваше время: {time / 60}:{string.Format("{0:00}", time % 60)}");
         }
 
         private void Restart()

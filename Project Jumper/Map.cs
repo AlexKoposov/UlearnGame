@@ -11,6 +11,7 @@ namespace Project_Jumper
         public MapCell[,] Level { get; private set; }
         public int Width => Level.GetLength(0);
         public int Height => Level.GetLength(1);
+        public int LevelTimeSeconds { get; private set; }
         public readonly Point Start;
 
         private const string playground = @"
@@ -75,6 +76,11 @@ X      B  B         B  J            X
 X   B  B  B         B               X
 X   BSSBSSBSSSSSSSSSBSSSSSSSSSSSSSSSX
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
+
+        public void IncreaseTime()
+        {
+            LevelTimeSeconds++;
+        }
 
         public Map()
         {
