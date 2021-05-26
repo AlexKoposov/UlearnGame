@@ -82,10 +82,13 @@ namespace Project_Jumper
                             case "JumpOrb":
                                 Jumped = false;
                                 FallTicks = 0;
+                                TriggerTicks = 999;
                                 Jump();
                                 break;
                             case "GravityOrb":
                                 ChangeGravity();
+                                TriggerTicks = 999;
+                                IsFalling = true;
                                 break;
                         }
             }
@@ -107,7 +110,7 @@ namespace Project_Jumper
         {
             IsFalling = true;
             if (!Jumped)
-                VelY = Gravity * (int)(Velocity * 1.25);
+                VelY = Gravity * (int)(Velocity * 1.5);
             Jumped = true;
         }
 

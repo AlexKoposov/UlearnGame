@@ -42,11 +42,18 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 X                                     X
 X                                     X
+X                  G                  X
 X                                     X
 X                                     X
 X                                     X
 X                                     X
 X                                     X
+X                                     X
+X                                     X
+X                                     X
+X                                     X
+X                                     X
+X                  G                  X
 X                                     X
 X                                     X
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
@@ -61,7 +68,7 @@ X       J                           X
 X    *         J                    X
 X       *  B                        X
 X             *  * BBB              X
-X                         J         X
+X                         J    J    X
 X                        * *        X
 X                               BBB X
 X                                   X
@@ -83,7 +90,7 @@ X  B            B          BB       X
 X               B * * *             X
 X         B * * B                BBBX
 X   G     B                  J      X
-X         B        G                X
+X         B          G              X
 X         BSSSSSS                   X
 X * * * * BBBBBBB     BBBBB      *  X
 X               B     B             X
@@ -98,6 +105,11 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
         public void IncreaseTime()
         {
             LevelTimeSeconds++;
+        }
+
+        public void ResestTime()
+        {
+            LevelTimeSeconds = 0;
         }
 
         public Map()

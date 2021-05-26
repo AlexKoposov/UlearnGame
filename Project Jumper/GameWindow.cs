@@ -15,6 +15,7 @@ namespace Project_Jumper
         Map map;
         Image playerSkin, border, block, spike, saw, jumpOrb, gravityOrb, finish, timerBackground;
         int degrees;
+        Rectangle camera;
 
         public GameWindow()
         {
@@ -27,7 +28,7 @@ namespace Project_Jumper
             KeyDown += new KeyEventHandler(OnPress);
             KeyUp += new KeyEventHandler(OnKeyUp);
 
-            SizeValue = Screen.FromControl(this).WorkingArea.Height / 20 + 1;
+            SizeValue = Screen.FromControl(this).WorkingArea.Height / 11;
             BlockSize = new Size(new Point(SizeValue, SizeValue));
 
             Initialise();
@@ -87,6 +88,7 @@ namespace Project_Jumper
             GetSprite(ref timerBackground, "Timer_Background");
             map = new Map();
             player = new Player(map.Start, SizeValue);
+            camera = new Rectangle(new Point(0, SizeValue * 5), screen.Size);
             GameTime.Start();
             LevelTime.Start();
         }
@@ -98,7 +100,7 @@ namespace Project_Jumper
 
         public void Update(object sender, EventArgs e)
         {
-            degrees += 4;
+            degrees += 1;
             player.TriggerTicks++;
             if (player.IsLevelCompleted && !player.IsMessageShowed)
             {
@@ -120,6 +122,8 @@ namespace Project_Jumper
             //    $" Up: ({Math.Floor((double)player.X / SizeValue)}, {Math.Ceiling((double)player.X / SizeValue)}; {Math.Ceiling((double)player.Y / SizeValue) + 1})" +
             //    $" Left: ({Math.Ceiling((double)player.X / SizeValue) - 1}; {Math.Floor((double)player.Y / SizeValue)}, {Math.Ceiling((double)player.Y / SizeValue)})" +
             //    $" Right: ({Math.Floor((double)player.X / SizeValue) + 1}; {Math.Floor((double)player.Y / SizeValue)}, {Math.Ceiling((double)player.Y / SizeValue)})";
+
+            //Text = $"Camera: X = {camera.X}, Y = {camera.Y}";
 
             UpdateTimeLabel();
             Invalidate();
@@ -148,6 +152,9 @@ namespace Project_Jumper
         private void Restart()
         {
             player = new Player(map.Start, SizeValue);
+            LevelTime.Stop();
+            LevelTime.Start();
+            map.ResestTime();
         }
 
         private void OnPaint(object sender, PaintEventArgs e)
@@ -158,8 +165,9 @@ namespace Project_Jumper
 
         private void DrawMap(Graphics g)
         {
-            for (var i = 0; i < map.Width; i++)
-                for (var j = 0; j < map.Height; j++)
+            var converted = ConvertMathToWorld(camera.X, camera.Y);
+            for (var i = converted.X / SizeValue; i < map.Width && i <= (converted.X + camera.Width) / SizeValue; i++)
+                for (var j = (converted.Y - camera.Height) / SizeValue; j < map.Height && j <= converted.Y / SizeValue + 1; j++)
                     switch (map.Level[i, j].Type)
                     {
                         case "Border":
@@ -172,7 +180,7 @@ namespace Project_Jumper
                             DrawElement(spike, g, i, j);
                             break;
                         case "Saw":
-                            DrawElement(RotateImage(saw, degrees), g, i, j);
+                            DrawElement(RotateImage(saw, degrees * 4), g, i, j);
                             break;
                         case "JumpOrb":
                             DrawElement(jumpOrb, g, i, j);
@@ -184,7 +192,7 @@ namespace Project_Jumper
                             DrawElement(finish, g, i, j);
                             break;
                     }
-            g.DrawImage(playerSkin, ConvertMathToWorld(player.X, player.Y));
+            g.DrawImage(playerSkin, ApplyCameraOffset(player.X, player.Y));
         }
 
         public static Bitmap RotateImage(Image image, float angle)
@@ -203,7 +211,7 @@ namespace Project_Jumper
 
         private void DrawElement(Image e, Graphics g, int i, int j)
         {
-            g.DrawImage(e, ConvertMathToWorld(i * SizeValue, j * SizeValue));
+            g.DrawImage(e, ApplyCameraOffset(i * SizeValue, j * SizeValue));
         }
 
         private Image FitInSize(Image image) =>
@@ -211,5 +219,24 @@ namespace Project_Jumper
 
         private Point ConvertMathToWorld(int x, int y) =>
             new Point(x, (map.Height - 1) * SizeValue - y);
+
+        private Point ApplyCameraOffset(int x, int y)
+        {
+            var titleHeight = 17;
+            var point = ConvertMathToWorld(x, y);
+            camera.X = player.X - camera.Width / 2 + SizeValue;
+            if (camera.X < 0) camera.X = 0;
+            else if (camera.X + camera.Width > map.Width * SizeValue)
+                camera.X = map.Width * SizeValue - camera.Width;
+
+            camera.Y = (map.Height - 1) * SizeValue - player.Y - camera.Height / 2 + SizeValue / 2;
+            if (camera.Y < 0) camera.Y = 0;
+            else if (camera.Y + camera.Height + titleHeight > map.Height * SizeValue)
+                camera.Y = map.Height * SizeValue - camera.Height - titleHeight;
+
+            point.X -= camera.X;
+            point.Y -= camera.Y;
+            return point;
+        }
     }
 }
