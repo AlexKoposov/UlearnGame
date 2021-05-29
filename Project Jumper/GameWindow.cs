@@ -214,7 +214,21 @@ namespace Project_Jumper
                             DrawElement(finish, g, i, j);
                             break;
                     }
+            UpdatePlayerSkin();
             g.DrawImage(playerSkin, ApplyCameraOffset(player.X, player.Y));
+        }
+
+        private void UpdatePlayerSkin()
+        {
+            switch (player.GameMode)
+            {
+                case Gamemodes.Ball:
+                    GetSprite(ref playerSkin, "Ball");
+                    break;
+                default:
+                    GetSprite(ref playerSkin, "Cube");
+                    break;
+            }
         }
 
         public static Bitmap RotateImage(Image image, float angle)
