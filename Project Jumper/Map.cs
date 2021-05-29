@@ -10,7 +10,7 @@ namespace Project_Jumper
         public int LevelTimeSeconds { get; private set; }
         public readonly Point Start;
 
-        private const string playground = @"
+        private const string sandbox = @"
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 X                                   X
 X                                   X
@@ -60,9 +60,9 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
 
         private const string level1 = @"
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-XFFFF                               X
-XFFFF                               X
-XFFFF                               X
+XF                                  X
+XF                                  X
+XF                                  X
 XBBBB                               X
 X       J                           X
 X    *         J                    X
@@ -115,7 +115,7 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
         public Map()
         {
             Start = new Point(1, 1);
-            Level = MapCreator.CreateMap(level2);
+            Level = MapCreator.CreateMap(sandbox);
         }
     }
 }

@@ -7,27 +7,21 @@ namespace Project_Jumper
 {
     public partial class GameWindow : Form
     {
-        Rectangle screen;
-        readonly int SizeValue;
-        readonly Size BlockSize;
-        string currentPath;
-        Player player;
-        Map map;
-        Image playerSkin, border, block, spike, saw, jumpOrb, gravityOrb, finish, timerBackground;
-        int degrees;
-        Rectangle camera;
+        private readonly int SizeValue;
+        private readonly Size BlockSize;
+        private Rectangle screen;
+        private string currentPath;
+        private Player player;
+        private Map map;
+        private Image playerSkin, border, block, spike, saw, jumpOrb, gravityOrb, finish, timerBackground;
+        private int degrees;
+        private Rectangle camera;
 
         public GameWindow()
         {
             InitializeComponent();
+
             screen = Screen.FromControl(this).WorkingArea;
-
-            GameTime.Interval = 10;
-            GameTime.Tick += new EventHandler(Update);
-
-            KeyDown += new KeyEventHandler(OnPress);
-            KeyUp += new KeyEventHandler(OnKeyUp);
-
             SizeValue = Screen.FromControl(this).WorkingArea.Height / 11;
             BlockSize = new Size(new Point(SizeValue, SizeValue));
 
@@ -58,25 +52,58 @@ namespace Project_Jumper
                     player.IsRightMoving = true;
                     break;
                 case Keys.W:
-                    player.IsJumping = true;
+                    JumpAction();
                     break;
                 case Keys.Space:
-                    player.IsJumping = true;
+                    JumpAction();
                     break;
                 case Keys.Up:
-                    player.TriggerTicks = 0;
+                    TriggerReadyAction();
+                    break;
+                case Keys.R:
+                    Restart();
+                    break;
+                case Keys.D1:
+                    player.GameMode = Gamemodes.Cube;
+                    break;
+                case Keys.D2:
+                    player.GameMode = Gamemodes.Ball;
+                    break;
+                case Keys.D3:
+                    player.GameMode = Gamemodes.Jetpack;
                     break;
             }
         }
 
-        public void OnMouseClick(object sender, MouseEventArgs e)
+        public void OnMouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+                TriggerReadyAction();
+        }
+
+        private void TriggerReadyAction()
         {
             player.TriggerTicks = 0;
+        }
+
+        private void JumpAction()
+        {
+            player.IsJumping = true;
         }
 
         void Initialise()
         {
             currentPath = new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName.ToString();
+            GetAllSprites();
+            map = new Map();
+            player = new Player(map.Start, SizeValue);
+            camera = new Rectangle(new Point(0, 0), screen.Size);
+            GameTime.Start();
+            LevelTime.Start();
+        }
+
+        private void GetAllSprites()
+        {
             GetSprite(ref playerSkin, "Cube");
             GetSprite(ref border, "Border");
             GetSprite(ref block, "Block");
@@ -86,11 +113,6 @@ namespace Project_Jumper
             GetSprite(ref gravityOrb, "Blue_Orb");
             GetSprite(ref finish, "Finish");
             GetSprite(ref timerBackground, "Timer_Background");
-            map = new Map();
-            player = new Player(map.Start, SizeValue);
-            camera = new Rectangle(new Point(0, SizeValue * 5), screen.Size);
-            GameTime.Start();
-            LevelTime.Start();
         }
 
         private void GetSprite(ref Image inGameSprite, string spriteName)
@@ -224,6 +246,7 @@ namespace Project_Jumper
         {
             var titleHeight = 17;
             var point = ConvertMathToWorld(x, y);
+
             camera.X = player.X - camera.Width / 2 + SizeValue;
             if (camera.X < 0) camera.X = 0;
             else if (camera.X + camera.Width > map.Width * SizeValue)

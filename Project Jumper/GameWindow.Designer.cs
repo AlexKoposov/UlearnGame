@@ -38,6 +38,8 @@ namespace Project_Jumper
             // GameTime
             // 
             this.GameTime.Enabled = true;
+            this.GameTime.Interval = 10;
+            this.GameTime.Tick += new System.EventHandler(this.Update);
             // 
             // LevelTime
             // 
@@ -55,7 +57,7 @@ namespace Project_Jumper
             this.TimeLabel.TabIndex = 0;
             this.TimeLabel.Text = "TimeLabel";
             // 
-            // MyForm
+            // GameWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -65,14 +67,15 @@ namespace Project_Jumper
             this.Controls.Add(this.TimeLabel);
             this.DoubleBuffered = true;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
-            this.Name = "MyForm";
+            this.Name = "GameWindow";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Jumper";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Load += new System.EventHandler(this.Update);
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.OnPaint);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnPress);
-            this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnMouseClick);
+            this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.OnKeyUp);
+            this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnMouseDown);
             this.ResumeLayout(false);
             this.PerformLayout();
 
