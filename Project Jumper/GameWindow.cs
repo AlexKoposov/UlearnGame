@@ -193,25 +193,25 @@ namespace Project_Jumper
                     switch (map.Level[i, j].Type)
                     {
                         case "Border":
-                            DrawElement(border, g, i, j);
+                            DrawMapElement(border, g, i, j);
                             break;
                         case "Block":
-                            DrawElement(block, g, i, j);
+                            DrawMapElement(block, g, i, j);
                             break;
                         case "Spike":
-                            DrawElement(spike, g, i, j);
+                            DrawMapElement(spike, g, i, j);
                             break;
                         case "Saw":
-                            DrawElement(RotateImage(saw, degrees * 4), g, i, j);
+                            DrawMapElement(RotateImage(saw, degrees * 4), g, i, j);
                             break;
                         case "JumpOrb":
-                            DrawElement(jumpOrb, g, i, j);
+                            DrawMapElement(jumpOrb, g, i, j);
                             break;
                         case "GravityOrb":
-                            DrawElement(gravityOrb, g, i, j);
+                            DrawMapElement(gravityOrb, g, i, j);
                             break;
                         case "Finish":
-                            DrawElement(finish, g, i, j);
+                            DrawMapElement(finish, g, i, j);
                             break;
                     }
             UpdatePlayerSkin();
@@ -245,7 +245,7 @@ namespace Project_Jumper
             return rotatedBmp;
         }
 
-        private void DrawElement(Image e, Graphics g, int i, int j)
+        private void DrawMapElement(Image e, Graphics g, int i, int j)
         {
             g.DrawImage(e, ApplyCameraOffset(i * SizeValue, j * SizeValue));
         }

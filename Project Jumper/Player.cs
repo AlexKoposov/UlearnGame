@@ -29,7 +29,6 @@ namespace Project_Jumper
         public int TriggerTicks { get; set; }
         public Gamemodes GameMode { get; set; }
 
-
         public Player(int x, int y, int size, Gamemodes gameMode = Gamemodes.Cube, int gravity = 1)
         {
             X = x;
