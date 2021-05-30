@@ -115,7 +115,7 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
         public Map()
         {
             Start = new Point(1, 1);
-            Level = MapCreator.CreateMap(sandbox);
+            Level = MapCreator.CreateMap(level1);
         }
     }
 }

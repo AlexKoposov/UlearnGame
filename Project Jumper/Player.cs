@@ -7,7 +7,8 @@ namespace Project_Jumper
     public class Player
     {
         private int Velocity { get; set; }
-        private int MaxYVel { get; set; }
+        private int MaxFallingVel { get; set; }
+        private int MaxFlyingVel { get; set; }
         private int Gravity { get; set; }
         public int X { get; private set; }
         public int Y { get; private set; }
@@ -16,16 +17,19 @@ namespace Project_Jumper
         public bool IsMoving => IsRightMoving
             || IsLeftMoving
             || IsFalling
-            || IsJumping;
+            || IsJumping
+            || IsFlying;
         public bool IsRightMoving { get; set; }
         public bool IsLeftMoving { get; set; }
         public bool IsJumping { get; set; }
+        public bool IsJumpOrbActive { get; set; }
         public bool IsFalling { get; set; }
-        public bool Jumped { get; set; }
+        public bool IsFlying { get; set; }
         public bool IsDead { get; set; }
         public bool IsLevelCompleted { get; set; }
         public bool IsMessageShowed { get; set; }
         public int FallTicks { get; set; }
+        public int FlyTicks { get; set; }
         public int TriggerTicks { get; set; }
         public Gamemodes GameMode { get; set; }
 
@@ -47,8 +51,8 @@ namespace Project_Jumper
         {
             Gravity = gravity;
             Velocity = size / 6;
-            MaxYVel = size / 4;
-            IsFalling = true;
+            MaxFallingVel = size / 4;
+            MaxFlyingVel = Velocity;
             GameMode = gameMode;
         }
 
@@ -92,9 +96,9 @@ namespace Project_Jumper
 
         private void JumpOrbAction()
         {
-            Jumped = false;
             FallTicks = 0;
             TriggerTicks = 999;
+            IsJumpOrbActive = true;
             Jump();
         }
 
@@ -119,16 +123,29 @@ namespace Project_Jumper
 
         public void Jump()
         {
-            IsFalling = true;
-            if (!Jumped)
+            if (!IsFalling || IsJumpOrbActive)
                 VelY = Gravity * (int)(Velocity * 1.5);
-            Jumped = true;
+            IsFalling = true;
+            IsJumpOrbActive = false;
         }
 
         public void Fall()
         {
             var k = ++FallTicks * 0.01;
             VelY += Gravity * (int)(-Velocity * k);
+        }
+
+        public void Fly()
+        {
+            if (!IsFlying) FlyTicks = 0;
+            else
+            {
+                IsFalling = false;
+                var k = ++FlyTicks * 0.04;
+                VelY = Gravity * (int)(Velocity * k);
+                if (VelY > MaxFlyingVel || VelY < MaxFlyingVel)
+                    VelY = Gravity * MaxFlyingVel;
+            }
         }
 
         public void ChangeGravity() =>
@@ -190,20 +207,21 @@ namespace Project_Jumper
             {
                 switch (GameMode)
                 {
+                    case Gamemodes.Cube:
+                        Jump();
+                        break;
                     case Gamemodes.Ball:
                         if (!IsFalling)
                             GravityOrbAction();
                         break;
-                    default:
-                        Jump();
-                        break;
                 }
             }
+            if (IsFlying) Fly();
             if (IsFalling) Fall();
-            if (VelY > MaxYVel)
-                VelY = MaxYVel;
-            else if (VelY < -MaxYVel)
-                VelY = -MaxYVel;
+            if (VelY > MaxFallingVel)
+                VelY = MaxFallingVel;
+            else if (VelY < -MaxFallingVel)
+                VelY = -MaxFallingVel;
             var dirY = Y + VelY;
             var isUpStuck = false;
 
@@ -217,7 +235,7 @@ namespace Project_Jumper
             {
                 var downLeft = new Point((int)Math.Floor((double)X / size), (int)Math.Floor((double)dirY / size));
                 var downRight = new Point((int)Math.Ceiling((double)X / size), (int)Math.Floor((double)dirY / size));
-                Collide(map, size, downLeft, downRight, true, ref isUpStuck);
+                CollideY(map, size, downLeft, downRight, true, ref isUpStuck);
             }
 
             if (dirY > (map.Height - 1) * size)
@@ -230,7 +248,7 @@ namespace Project_Jumper
             {
                 var upLeft = new Point((int)Math.Floor((double)X / size), (int)Math.Ceiling((double)dirY / size));
                 var upRight = new Point((int)Math.Ceiling((double)X / size), (int)Math.Ceiling((double)dirY / size));
-                Collide(map, size, upLeft, upRight, false, ref isUpStuck);
+                CollideY(map, size, upLeft, upRight, false, ref isUpStuck);
             }
 
             if (!IsJumping && !IsFalling) VelY = 0;
@@ -238,14 +256,16 @@ namespace Project_Jumper
             if (isUpStuck) IsFalling = true;
         }
 
-        private void Collide(Map map, int size, Point first, Point second, bool defaultIsDown, ref bool isUpStuck)
+        private void CollideY(Map map, int size, Point first, Point second, bool defaultIsDown, ref bool isUpStuck)
         {
-            if (VelY == 0 && (defaultIsDown ? Gravity == 1 : Gravity == -1))
+            if (VelY == 0
+                && (defaultIsDown ? Gravity == 1 : Gravity == -1))
             {
                 first.Y -= Gravity;
                 second.Y -= Gravity;
             }
-            if ((defaultIsDown ? first.Y >= 0 : first.Y <= map.Height - 1) && CheckCollision(map, first, second))
+            if ((defaultIsDown ? first.Y >= 0 : first.Y <= map.Height - 1)
+                && CheckCollision(map, first, second))
             {
                 Y = (first.Y + (defaultIsDown ? 1 : -1)) * size;
                 if (defaultIsDown)
@@ -269,16 +289,13 @@ namespace Project_Jumper
 
         private bool ApplyUpStuck()
         {
-            bool isUpStuck;
             StopJumping();
-            isUpStuck = true;
-            return isUpStuck;
+            return true;
         }
 
         private void ApplyLanding()
         {
             StopJumping();
-            Jumped = false;
         }
 
         private static bool CheckCollision(Map map, Point p1, Point p2)

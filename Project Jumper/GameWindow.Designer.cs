@@ -44,7 +44,7 @@ namespace Project_Jumper
             // 
             // LevelTime
             // 
-            this.LevelTime.Enabled = true;
+            this.LevelTime.Enabled = false;
             this.LevelTime.Interval = 1000;
             this.LevelTime.Tick += new System.EventHandler(this.LevelTime_Tick);
             // 

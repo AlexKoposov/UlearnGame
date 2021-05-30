@@ -38,6 +38,10 @@ namespace Project_Jumper
                 case Keys.D:
                     player.IsRightMoving = false;
                     break;
+                case Keys.Space:
+                    if (player.GameMode == Gamemodes.Jetpack)
+                        player.IsFlying = false;
+                    break;
             }
         }
 
@@ -88,7 +92,9 @@ namespace Project_Jumper
 
         private void JumpAction()
         {
-            player.IsJumping = true;
+            if (player.GameMode == Gamemodes.Jetpack)
+                player.IsFlying = true;
+            else player.IsJumping = true;
         }
 
         void Initialise()
@@ -99,7 +105,6 @@ namespace Project_Jumper
             player = new Player(map.Start, SizeValue);
             camera = new Rectangle(new Point(0, 0), screen.Size);
             GameTime.Start();
-            LevelTime.Start();
         }
 
         private void GetAllSprites()
@@ -136,16 +141,9 @@ namespace Project_Jumper
             if (player.TriggerTicks != 0)
                 player.ReactToOrbs(map, SizeValue);
             if (player.IsMoving)
-                player.Move(map, SizeValue);
-
-            //Text = $"Position: X = {player.X}, Y = {player.Y}, " +
-            //    $"Map pos: ({Math.Round((double)player.X / SizeValue)}; {Math.Round((double)player.Y / SizeValue)})" +
-            //    $" Down: ({Math.Floor((double)player.X / SizeValue)}, {Math.Ceiling((double)player.X / SizeValue)}; {Math.Floor((double)player.Y / SizeValue) - 1})" +
-            //    $" Up: ({Math.Floor((double)player.X / SizeValue)}, {Math.Ceiling((double)player.X / SizeValue)}; {Math.Ceiling((double)player.Y / SizeValue) + 1})" +
-            //    $" Left: ({Math.Ceiling((double)player.X / SizeValue) - 1}; {Math.Floor((double)player.Y / SizeValue)}, {Math.Ceiling((double)player.Y / SizeValue)})" +
-            //    $" Right: ({Math.Floor((double)player.X / SizeValue) + 1}; {Math.Floor((double)player.Y / SizeValue)}, {Math.Ceiling((double)player.Y / SizeValue)})";
-
-            //Text = $"Camera: X = {camera.X}, Y = {camera.Y}";
+                if (LevelTime.Enabled)
+                    player.Move(map, SizeValue);
+                else LevelTime.Start();
 
             UpdateTimeLabel();
             Invalidate();
@@ -175,7 +173,6 @@ namespace Project_Jumper
         {
             player = new Player(map.Start, SizeValue);
             LevelTime.Stop();
-            LevelTime.Start();
             map.ResestTime();
         }
 
