@@ -15,6 +15,7 @@ namespace Project_Jumper
         private Map map;
         private Image playerSkin, border, block, spike, saw, jumpOrb, gravityOrb, finish, timerBackground;
         private int degrees;
+        private bool plLastMoveWasRight = true;
         private Rectangle camera;
 
         public GameWindow()
@@ -51,9 +52,11 @@ namespace Project_Jumper
             {
                 case Keys.A:
                     player.IsLeftMoving = true;
+                    plLastMoveWasRight = false;
                     break;
                 case Keys.D:
                     player.IsRightMoving = true;
+                    plLastMoveWasRight = true;
                     break;
                 case Keys.W:
                     JumpAction();
@@ -221,6 +224,13 @@ namespace Project_Jumper
             {
                 case Gamemodes.Ball:
                     GetSprite(ref playerSkin, "Ball");
+                    break;
+                case Gamemodes.Jetpack:
+                    GetSprite(ref playerSkin, "Jetpack");
+                    if (plLastMoveWasRight)
+                        playerSkin.RotateFlip(RotateFlipType.RotateNoneFlipX);
+                    if (player.Gravity == -1)
+                        playerSkin.RotateFlip(RotateFlipType.RotateNoneFlipY);
                     break;
                 default:
                     GetSprite(ref playerSkin, "Cube");
