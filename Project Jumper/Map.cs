@@ -1,121 +1,69 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
 
 namespace Project_Jumper
 {
     public class Map
     {
         public MapCell[,] Level { get; private set; }
+        public List<string> AvailableLevels { get; private set; }
+        public int LevelTimeSeconds { get; private set; }
+        public int BestLevelTime { get; private set; }
         public int Width => Level.GetLength(0);
         public int Height => Level.GetLength(1);
-        public int LevelTimeSeconds { get; private set; }
-        public readonly Point Start;
+        public readonly Point StartPosition;
+        private int levelId = 0;
+        private readonly List<Tuple<int, string>> converted;
 
-        private const string sandbox = @"
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-X                                   X
-X                                   X
-X                                   X
-X                   G               X
-X                                   X
-X                                   X
-X                                   X
-X                                   X
-X                                   X
-X                   G               X
-X                                   X
-X             J           J         X
-X       F                           X
-X   *   F             B             X
-X   *   F          B                X
-X   *           B                   X
-X            B                      X
-X         B           G       J  SSSX
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
+        public Map()
+        {
+            converted = LevelConverter.GetAllLevels();
+            BestLevelTime = converted[levelId].Item1;
+            AvailableLevels = converted
+                .Select(t => t.Item2)
+                .ToList();
+            StartPosition = new Point(1, 1);
+            Level = MapBuilder.CreateMap(AvailableLevels[levelId]);
+        }
 
-        private const string heightTest = @"
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-X                             X
-X                             X
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
-
-        private const string jumpTest = @"
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-X                                     X
-X                                     X
-X                  G                  X
-X                                     X
-X                                     X
-X                                     X
-X                                     X
-X                                     X
-X                                     X
-X                                     X
-X                                     X
-X                                     X
-X                                     X
-X                  G                  X
-X                                     X
-X                                     X
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
-
-        private const string level1 = @"
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-XF                                  X
-XF                                  X
-XF                                  X
-XBBBB                               X
-X       J                           X
-X    *         J                    X
-X       *  B                        X
-X             *  * BBB              X
-X                         J    J    X
-X                        * *        X
-X                               BBB X
-X                                   X
-X                                   X
-X                         BBBB      X
-X         B    J    B               X
-X      B  B         B  J            X
-X   B  B  B         B               X
-X   BSSBSSBSSSSSSSSSBSSSSSSSSSSSSSSSX
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
-
-        private const string level2 = @"
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-XFFB   *                            X
-X  B  *                             X
-X  B *                              X
-X  B*           BBB    J            X
-X  B            B          BB       X
-X               B * * *             X
-X         B * * B                BBBX
-X   G     B                  J      X
-X         B          G              X
-X         BSSSSSS                   X
-X * * * * BBBBBBB     BBBBB      *  X
-X               B     B             X
-X               B     B     *       X
-X                     B          *  X
-X      B  G           B             X
-X      B                    *       X
-X   B  B                            X
-X   BSSBSSSSSSSSSSSSSSSSSSSSSSSSSSSSX
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
+        public void ChangeLevel()
+        {
+            if (++levelId < AvailableLevels.Count)
+            {
+                Level = MapBuilder.CreateMap(AvailableLevels[levelId]);
+                BestLevelTime = converted[levelId].Item1;
+            }
+            else levelId = AvailableLevels.Count - 1;
+        }
 
         public void IncreaseTime()
         {
             LevelTimeSeconds++;
         }
 
-        public void ResestTime()
+        public void ResetTime()
         {
             LevelTimeSeconds = 0;
         }
 
-        public Map()
+        public void ResetBestTime()
         {
-            Start = new Point(1, 1);
-            Level = MapCreator.CreateMap(level1);
+            BestLevelTime = 9999;
+            UpdateBestTime(9999);
+        }
+
+        public void UpdateBestTime(int newTime = -1)
+        {
+            if (LevelTimeSeconds < BestLevelTime
+                || BestLevelTime == 9999)
+            {
+                if (newTime == -1)
+                    BestLevelTime = LevelTimeSeconds;
+                converted[levelId] = Tuple.Create(BestLevelTime, converted[levelId].Item2);
+                LevelConverter.WriteChanges(converted);
+            }
         }
     }
 }

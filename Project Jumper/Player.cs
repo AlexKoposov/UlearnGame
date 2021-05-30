@@ -6,32 +6,32 @@ namespace Project_Jumper
 {
     public class Player
     {
-        private int Velocity { get; set; }
-        private int MaxFallingVel { get; set; }
-        private int MaxFlyingVel { get; set; }
-        public int Gravity { get; private set; }
-        public int X { get; private set; }
-        public int Y { get; private set; }
-        public int VelX { get; private set; }
-        public int VelY { get; private set; }
-        public bool IsMoving => IsRightMoving
-            || IsLeftMoving
-            || IsFalling
-            || IsJumping
-            || IsFlying;
-        public bool IsRightMoving { get; set; }
-        public bool IsLeftMoving { get; set; }
-        public bool IsJumping { get; set; }
+        public bool MovingRight { get; set; }
+        public bool MovingLeft { get; set; }
+        public bool Jumping { get; set; }
         public bool IsJumpOrbActive { get; set; }
-        public bool IsFalling { get; set; }
-        public bool IsFlying { get; set; }
-        public bool IsDead { get; set; }
+        public bool Falling { get; set; }
+        public bool Flying { get; set; }
+        public bool Dead { get; set; }
         public bool IsLevelCompleted { get; set; }
         public bool IsMessageShowed { get; set; }
         public int FallTicks { get; set; }
         public int FlyTicks { get; set; }
         public int TriggerTicks { get; set; }
         public Gamemodes GameMode { get; set; }
+        public int Gravity { get; private set; }
+        public int X { get; private set; }
+        public int Y { get; private set; }
+        public int VelX { get; private set; }
+        public int VelY { get; private set; }
+        public bool Moving => MovingRight
+            || MovingLeft
+            || Falling
+            || Jumping
+            || Flying;
+        private int Velocity { get; set; }
+        private int MaxFallingVel { get; set; }
+        private int MaxFlyingVel { get; set; }
 
         public Player(int x, int y, int size, Gamemodes gameMode = Gamemodes.Cube, int gravity = 1)
         {
@@ -40,20 +40,11 @@ namespace Project_Jumper
             ApplyDefaultConditions(size, gravity, gameMode);
         }
 
-        public Player(Point startPos, int size, Gamemodes gameMode = Gamemodes.Cube, int gravity = 1)
+        public Player(Point mapStartPos, int size, Gamemodes gameMode = Gamemodes.Cube, int gravity = 1)
         {
-            X = startPos.X * size;
-            Y = startPos.Y * size;
+            X = mapStartPos.X * size;
+            Y = mapStartPos.Y * size;
             ApplyDefaultConditions(size, gravity, gameMode);
-        }
-
-        private void ApplyDefaultConditions(int size, int gravity, Gamemodes gameMode)
-        {
-            Gravity = gravity;
-            Velocity = size / 6;
-            MaxFallingVel = size / 4;
-            MaxFlyingVel = Velocity;
-            GameMode = gameMode;
         }
 
         public void Move(Map map, int size)
@@ -64,8 +55,8 @@ namespace Project_Jumper
 
         public void Stop()
         {
-            IsLeftMoving = false;
-            IsRightMoving = false;
+            MovingLeft = false;
+            MovingRight = false;
             StopJumping();
         }
 
@@ -94,6 +85,15 @@ namespace Project_Jumper
             }
         }
 
+        private void ApplyDefaultConditions(int size, int gravity, Gamemodes gameMode)
+        {
+            Gravity = gravity;
+            Velocity = size / 6;
+            MaxFallingVel = size / 4;
+            MaxFlyingVel = Velocity;
+            GameMode = gameMode;
+        }
+
         private void JumpOrbAction()
         {
             FallTicks = 0;
@@ -102,45 +102,33 @@ namespace Project_Jumper
             Jump();
         }
 
-        public void GravityOrbAction()
+        private void GravityOrbAction()
         {
             ChangeGravity();
             TriggerTicks = 999;
-            IsFalling = true;
+            Falling = true;
         }
 
-        public void MoveRight()
+        private void Jump()
         {
-            if (VelX < Velocity)
-                VelX += Velocity;
-        }
-
-        public void MoveLeft()
-        {
-            if (VelX > -Velocity)
-                VelX -= Velocity;
-        }
-
-        public void Jump()
-        {
-            if (!IsFalling || IsJumpOrbActive)
+            if (!Falling || IsJumpOrbActive)
                 VelY = Gravity * (int)(Velocity * 1.5);
-            IsFalling = true;
+            Falling = true;
             IsJumpOrbActive = false;
         }
 
-        public void Fall()
+        private void Fall()
         {
             var k = ++FallTicks * 0.01;
             VelY += Gravity * (int)(-Velocity * k);
         }
 
-        public void Fly()
+        private void Fly()
         {
-            if (!IsFlying) FlyTicks = 0;
+            if (!Flying) FlyTicks = 0;
             else
             {
-                IsFalling = false;
+                Falling = false;
                 var k = ++FlyTicks * 0.04;
                 VelY = Gravity * (int)(Velocity * k);
                 if (VelY > MaxFlyingVel || VelY < MaxFlyingVel)
@@ -148,16 +136,16 @@ namespace Project_Jumper
             }
         }
 
-        public void ChangeGravity() =>
+        private void ChangeGravity() =>
             Gravity = Gravity == 1 ? -1 : 1;
 
         private void ProcessCollisionX(Map map, int size)
         {
-            if (!IsRightMoving && !IsLeftMoving)
+            if (!MovingRight && !MovingLeft)
                 VelX = 0;
-            if (IsRightMoving && VelX < Velocity)
+            if (MovingRight && VelX < Velocity)
                 VelX += Velocity;
-            if (IsLeftMoving && VelX > -Velocity)
+            if (MovingLeft && VelX > -Velocity)
                 VelX -= Velocity;
 
             var dirX = X + VelX;
@@ -203,7 +191,7 @@ namespace Project_Jumper
 
         private void ProcessCollisionY(Map map, int size)
         {
-            if (IsJumping)
+            if (Jumping)
             {
                 switch (GameMode)
                 {
@@ -211,13 +199,13 @@ namespace Project_Jumper
                         Jump();
                         break;
                     case Gamemodes.Ball:
-                        if (!IsFalling)
+                        if (!Falling)
                             GravityOrbAction();
                         break;
                 }
             }
-            if (IsFlying) Fly();
-            if (IsFalling) Fall();
+            if (Flying) Fly();
+            if (Falling) Fall();
             if (VelY > MaxFallingVel)
                 VelY = MaxFallingVel;
             else if (VelY < -MaxFallingVel)
@@ -251,9 +239,9 @@ namespace Project_Jumper
                 CollideY(map, size, upLeft, upRight, false, ref isUpStuck);
             }
 
-            if (!IsJumping && !IsFalling) VelY = 0;
+            if (!Jumping && !Falling) VelY = 0;
             Y += VelY;
-            if (isUpStuck) IsFalling = true;
+            if (isUpStuck) Falling = true;
         }
 
         private void CollideY(Map map, int size, Point first, Point second, bool defaultIsDown, ref bool isUpStuck)
@@ -283,7 +271,7 @@ namespace Project_Jumper
             }
             else if (defaultIsDown)
             {
-                IsFalling = true;
+                Falling = true;
             }
         }
 
@@ -313,15 +301,15 @@ namespace Project_Jumper
 
         private void CheckFriendlyness(Map map, Point p1, Point p2)
         {
-            if (!IsDead)
-                IsDead = !map.Level[p1.X, p1.Y].IsFriendly
+            if (!Dead)
+                Dead = !map.Level[p1.X, p1.Y].IsFriendly
                       || !map.Level[p2.X, p2.Y].IsFriendly;
         }
 
         private void StopJumping()
         {
-            IsFalling = false;
-            IsJumping = false;
+            Falling = false;
+            Jumping = false;
             FallTicks = 0;
         }
     }

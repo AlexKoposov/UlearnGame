@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Project_Jumper
 {
-    class MapCreator
+    public class MapBuilder
     {
         public static MapCell[,] CreateMap(string map, string separator = "\r\n")
         {
@@ -11,7 +11,7 @@ namespace Project_Jumper
                 .Reverse()
                 .ToArray();
             if (rows.Select(z => z.Length).Distinct().Count() != 1)
-                throw new Exception($"Wrong test map '{map}'");
+                throw new Exception($"Wrong map '{map}'");
             var result = new MapCell[rows[0].Length, rows.Length];
             for (var x = 0; x < rows[0].Length; x++)
                 for (var y = 0; y < rows.Length; y++)

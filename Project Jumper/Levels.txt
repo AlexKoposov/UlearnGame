@@ -1,0 +1,42 @@
+166:39|
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+XF                                  X
+XF                                  X
+XF                                  X
+XBBBB                               X
+X       J                           X
+X    *         J                    X
+X       *  B                        X
+X             *  * BBB              X
+X                         J    J    X
+X                        * *        X
+X                               BBB X
+X                                   X
+X                                   X
+X                         BBBB      X
+X         B    J    B               X
+X      B  B         B  J            X
+X   B  B  B         B               X
+X   BSSBSSBSSSSSSSSSBSSSSSSSSSSSSSSSX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+-166:39|
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+XFFB   *                            X
+X  B  *                             X
+X  B *                              X
+X  B*           BBB    J            X
+X  B            B          BB       X
+X               B * * *             X
+X         B * * B                BBBX
+X   G     B                  J      X
+X         B          G              X
+X         BSSSSSS                   X
+X * * * * BBBBBBB     BBBBB      *  X
+X               B     B             X
+X               B     B     *       X
+X                     B          *  X
+X      B  G           B             X
+X      B                    *       X
+X   B  B                            X
+X   BSSBSSSSSSSSSSSSSSSSSSSSSSSSSSSSX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX

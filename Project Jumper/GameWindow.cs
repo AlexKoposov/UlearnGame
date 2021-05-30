@@ -15,8 +15,8 @@ namespace Project_Jumper
         private Map map;
         private Image playerSkin, border, block, spike, saw, jumpOrb, gravityOrb, finish, timerBackground;
         private int degrees;
-        private bool plLastMoveWasRight = true;
         private Rectangle camera;
+        private bool playerLastMoveWasRight = true;
 
         public GameWindow()
         {
@@ -34,14 +34,16 @@ namespace Project_Jumper
             switch (e.KeyCode)
             {
                 case Keys.A:
-                    player.IsLeftMoving = false;
+                    player.MovingLeft = false;
                     break;
                 case Keys.D:
-                    player.IsRightMoving = false;
+                    player.MovingRight = false;
                     break;
                 case Keys.Space:
-                    if (player.GameMode == Gamemodes.Jetpack)
-                        player.IsFlying = false;
+                    DisableFlying();
+                    break;
+                case Keys.W:
+                    DisableFlying();
                     break;
             }
         }
@@ -51,12 +53,12 @@ namespace Project_Jumper
             switch (e.KeyCode)
             {
                 case Keys.A:
-                    player.IsLeftMoving = true;
-                    plLastMoveWasRight = false;
+                    player.MovingLeft = true;
+                    playerLastMoveWasRight = false;
                     break;
                 case Keys.D:
-                    player.IsRightMoving = true;
-                    plLastMoveWasRight = true;
+                    player.MovingRight = true;
+                    playerLastMoveWasRight = true;
                     break;
                 case Keys.W:
                     JumpAction();
@@ -79,6 +81,9 @@ namespace Project_Jumper
                 case Keys.D3:
                     player.GameMode = Gamemodes.Jetpack;
                     break;
+                case Keys.D0:
+                    map.ResetBestTime();
+                    break;
             }
         }
 
@@ -86,6 +91,42 @@ namespace Project_Jumper
         {
             if (e.Button == MouseButtons.Left)
                 TriggerReadyAction();
+        }
+
+        public void Update(object sender, EventArgs e)
+        {
+            degrees += 1;
+            player.TriggerTicks++;
+            if (player.IsLevelCompleted
+                && !player.IsMessageShowed)
+            {
+                player.IsMessageShowed = true;
+                player.Stop();
+                LevelTime.Stop();
+                map.UpdateBestTime();
+                ShowMessage();
+                map.ChangeLevel();
+                Restart();
+            }
+            if (player.Dead)
+                Restart();
+            if (player.TriggerTicks != 0)
+                player.ReactToOrbs(map, SizeValue);
+            if (player.Moving)
+            {
+                if (LevelTime.Enabled)
+                    player.Move(map, SizeValue);
+                else LevelTime.Start();
+            }
+
+            UpdateTimeLabel();
+            Invalidate();
+        }
+
+        private void DisableFlying()
+        {
+            if (player.GameMode == Gamemodes.Jetpack)
+                player.Flying = false;
         }
 
         private void TriggerReadyAction()
@@ -96,16 +137,16 @@ namespace Project_Jumper
         private void JumpAction()
         {
             if (player.GameMode == Gamemodes.Jetpack)
-                player.IsFlying = true;
-            else player.IsJumping = true;
+                player.Flying = true;
+            else player.Jumping = true;
         }
 
-        void Initialise()
+        private void Initialise()
         {
             currentPath = new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName.ToString();
             GetAllSprites();
             map = new Map();
-            player = new Player(map.Start, SizeValue);
+            player = new Player(map.StartPosition, SizeValue);
             camera = new Rectangle(new Point(0, 0), screen.Size);
             GameTime.Start();
         }
@@ -128,34 +169,10 @@ namespace Project_Jumper
             inGameSprite = FitInSize(new Bitmap(Path.Combine(currentPath, $"Resources\\{spriteName}.png")));
         }
 
-        public void Update(object sender, EventArgs e)
-        {
-            degrees += 1;
-            player.TriggerTicks++;
-            if (player.IsLevelCompleted && !player.IsMessageShowed)
-            {
-                player.IsMessageShowed = true;
-                player.Stop();
-                LevelTime.Stop();
-                ShowMessage();
-            }
-            if (player.IsDead)
-                Restart();
-            if (player.TriggerTicks != 0)
-                player.ReactToOrbs(map, SizeValue);
-            if (player.IsMoving)
-                if (LevelTime.Enabled)
-                    player.Move(map, SizeValue);
-                else LevelTime.Start();
-
-            UpdateTimeLabel();
-            Invalidate();
-        }
-
         private void UpdateTimeLabel()
         {
             var time = map.LevelTimeSeconds;
-            TimeLabel.Text = $"{time / 60}:{string.Format("{0:00}", time % 60)}".ToString();
+            TimeLabel.Text = LevelConverter.ConvertToDefaultTime(time);
             TimeLabel.Location = new Point(screen.Width - TimeLabel.Size.Width + 1, 0);
             TimeLabel.Image = new Bitmap(timerBackground, TimeLabel.Size);
         }
@@ -169,14 +186,15 @@ namespace Project_Jumper
         {
             var time = map.LevelTimeSeconds;
             MessageBox.Show(@$"Вы победили!
-Ваше время: {time / 60}:{string.Format("{0:00}", time % 60)}");
+Ваше время: {LevelConverter.ConvertToDefaultTime(time)}
+Лучшее время: {LevelConverter.ConvertToDefaultTime(map.BestLevelTime)}");
         }
 
         private void Restart()
         {
-            player = new Player(map.Start, SizeValue);
+            player = new Player(map.StartPosition, SizeValue);
             LevelTime.Stop();
-            map.ResestTime();
+            map.ResetTime();
         }
 
         private void OnPaint(object sender, PaintEventArgs e)
@@ -227,7 +245,7 @@ namespace Project_Jumper
                     break;
                 case Gamemodes.Jetpack:
                     GetSprite(ref playerSkin, "Jetpack");
-                    if (plLastMoveWasRight)
+                    if (playerLastMoveWasRight)
                         playerSkin.RotateFlip(RotateFlipType.RotateNoneFlipX);
                     if (player.Gravity == -1)
                         playerSkin.RotateFlip(RotateFlipType.RotateNoneFlipY);
@@ -238,7 +256,7 @@ namespace Project_Jumper
             }
         }
 
-        public static Bitmap RotateImage(Image image, float angle)
+        private static Bitmap RotateImage(Image image, float angle)
         {
             if (image == null) throw new ArgumentNullException();
             PointF offset = new PointF((float)image.Width / 2, (float)image.Height / 2);

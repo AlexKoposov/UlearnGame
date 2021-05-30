@@ -90,4 +90,3 @@ namespace Project_Jumper
         private System.Windows.Forms.Label TimeLabel;
     }
 }
-
