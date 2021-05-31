@@ -29,6 +29,9 @@ namespace Project_Jumper
                 'J' => new MapCell("JumpOrb", true, false, true, false),
                 'G' => new MapCell("GravityOrb", true, false, true, false),
                 'F' => new MapCell("Finish", true, false, false, false),
+                'C' => new MapCell("CubePortal", true, false, false, true),
+                'O' => new MapCell("BallPortal", true, false, false, true),
+                'P' => new MapCell("JetPortal", true, false, false, true),
                 _ => new MapCell("Space", true, false, false, false)
             };
     }

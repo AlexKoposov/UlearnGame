@@ -28,14 +28,14 @@ namespace Project_Jumper
             Level = MapBuilder.CreateMap(AvailableLevels[levelId]);
         }
 
-        public void ChangeLevel()
+        public void ChangeToNextLevel()
         {
-            if (++levelId < AvailableLevels.Count)
-            {
-                Level = MapBuilder.CreateMap(AvailableLevels[levelId]);
-                BestLevelTime = converted[levelId].Item1;
-            }
-            else levelId = AvailableLevels.Count - 1;
+            ChangeLevel();
+        }
+
+        public void ChangeToPrevLevel()
+        {
+            ChangeLevel(-1);
         }
 
         public void IncreaseTime()
@@ -51,19 +51,28 @@ namespace Project_Jumper
         public void ResetBestTime()
         {
             BestLevelTime = 9999;
-            UpdateBestTime(9999);
+            UpdateBestTime(false);
         }
 
-        public void UpdateBestTime(int newTime = -1)
+        public void UpdateBestTime(bool isNewRecord = true)
         {
-            if (LevelTimeSeconds < BestLevelTime
-                || BestLevelTime == 9999)
+            if (LevelTimeSeconds < BestLevelTime || !isNewRecord)
             {
-                if (newTime == -1)
-                    BestLevelTime = LevelTimeSeconds;
+                if (isNewRecord) BestLevelTime = LevelTimeSeconds;
                 converted[levelId] = Tuple.Create(BestLevelTime, converted[levelId].Item2);
                 LevelConverter.WriteChanges(converted);
             }
+        }
+
+        private void ChangeLevel(int step = 1)
+        {
+            levelId += step;
+            if (levelId >= 0 && levelId < AvailableLevels.Count)
+            {
+                Level = MapBuilder.CreateMap(AvailableLevels[levelId]);
+                BestLevelTime = converted[levelId].Item1;
+            }
+            else levelId = levelId >= 0 ? AvailableLevels.Count - 1 : 0;
         }
     }
 }

@@ -44,7 +44,6 @@ namespace Project_Jumper
             // 
             // LevelTime
             // 
-            this.LevelTime.Enabled = false;
             this.LevelTime.Interval = 1000;
             this.LevelTime.Tick += new System.EventHandler(this.LevelTime_Tick);
             // 
@@ -67,7 +66,7 @@ namespace Project_Jumper
             this.ClientSize = new System.Drawing.Size(1184, 661);
             this.Controls.Add(this.TimeLabel);
             this.DoubleBuffered = true;
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "GameWindow";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;

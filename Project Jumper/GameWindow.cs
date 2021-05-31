@@ -13,7 +13,7 @@ namespace Project_Jumper
         private string currentPath;
         private Player player;
         private Map map;
-        private Image playerSkin, border, block, spike, saw, jumpOrb, gravityOrb, finish, timerBackground;
+        private Image playerSkin, border, block, spike, saw, jumpOrb, gravityOrb, finish, timerBackground, cubePortal, ballPortal, jetPortal;
         private int degrees;
         private Rectangle camera;
         private bool playerLastMoveWasRight = true;
@@ -34,15 +34,24 @@ namespace Project_Jumper
             switch (e.KeyCode)
             {
                 case Keys.A:
-                    player.MovingLeft = false;
+                    StopMovingLeft();
+                    break;
+                case Keys.Left:
+                    StopMovingLeft();
                     break;
                 case Keys.D:
-                    player.MovingRight = false;
+                    StopMovingRight();
+                    break;
+                case Keys.Right:
+                    StopMovingRight();
                     break;
                 case Keys.Space:
                     DisableFlying();
                     break;
                 case Keys.W:
+                    DisableFlying();
+                    break;
+                case Keys.Up:
                     DisableFlying();
                     break;
             }
@@ -53,12 +62,16 @@ namespace Project_Jumper
             switch (e.KeyCode)
             {
                 case Keys.A:
-                    player.MovingLeft = true;
-                    playerLastMoveWasRight = false;
+                    GoLeft();
+                    break;
+                case Keys.Left:
+                    GoLeft();
                     break;
                 case Keys.D:
-                    player.MovingRight = true;
-                    playerLastMoveWasRight = true;
+                    GoRight();
+                    break;
+                case Keys.Right:
+                    GoRight();
                     break;
                 case Keys.W:
                     JumpAction();
@@ -67,22 +80,37 @@ namespace Project_Jumper
                     JumpAction();
                     break;
                 case Keys.Up:
-                    TriggerReadyAction();
+                    JumpAction();
                     break;
                 case Keys.R:
                     Restart();
                     break;
+                case Keys.Escape:
+                    Close();
+                    break;
+
+                //DevTools
                 case Keys.D1:
                     player.GameMode = Gamemodes.Cube;
+                    DisableFlying();
                     break;
                 case Keys.D2:
                     player.GameMode = Gamemodes.Ball;
+                    DisableFlying();
                     break;
                 case Keys.D3:
                     player.GameMode = Gamemodes.Jetpack;
                     break;
                 case Keys.D0:
                     map.ResetBestTime();
+                    break;
+                case Keys.NumPad6:
+                    map.ChangeToNextLevel();
+                    Restart();
+                    break;
+                case Keys.NumPad4:
+                    map.ChangeToPrevLevel();
+                    Restart();
                     break;
             }
         }
@@ -105,7 +133,7 @@ namespace Project_Jumper
                 LevelTime.Stop();
                 map.UpdateBestTime();
                 ShowMessage();
-                map.ChangeLevel();
+                map.ChangeToNextLevel();
                 Restart();
             }
             if (player.Dead)
@@ -123,10 +151,31 @@ namespace Project_Jumper
             Invalidate();
         }
 
+        private void GoRight()
+        {
+            player.MovingRight = true;
+            playerLastMoveWasRight = true;
+        }
+
+        private void GoLeft()
+        {
+            player.MovingLeft = true;
+            playerLastMoveWasRight = false;
+        }
+
+        private void StopMovingRight()
+        {
+            player.MovingRight = false;
+        }
+
+        private void StopMovingLeft()
+        {
+            player.MovingLeft = false;
+        }
+
         private void DisableFlying()
         {
-            if (player.GameMode == Gamemodes.Jetpack)
-                player.Flying = false;
+            player.Flying = false;
         }
 
         private void TriggerReadyAction()
@@ -158,10 +207,13 @@ namespace Project_Jumper
             GetSprite(ref block, "Block");
             GetSprite(ref spike, "Spike");
             GetSprite(ref saw, "Saw");
-            GetSprite(ref jumpOrb, "Yellow_Orb");
-            GetSprite(ref gravityOrb, "Blue_Orb");
+            GetSprite(ref jumpOrb, "YellowOrb");
+            GetSprite(ref gravityOrb, "BlueOrb");
             GetSprite(ref finish, "Finish");
-            GetSprite(ref timerBackground, "Timer_Background");
+            GetSprite(ref timerBackground, "TimerBackground");
+            GetSprite(ref cubePortal, "GreenPortal");
+            GetSprite(ref ballPortal, "RedPortal");
+            GetSprite(ref jetPortal, "PurplePortal");
         }
 
         private void GetSprite(ref Image inGameSprite, string spriteName)
@@ -206,8 +258,11 @@ namespace Project_Jumper
         private void DrawMap(Graphics g)
         {
             var converted = ConvertMathToWorld(camera.X, camera.Y);
+            var futureJ = (converted.Y - camera.Height) / SizeValue;
+            if (futureJ < 0)
+                futureJ = 0;
             for (var i = converted.X / SizeValue; i < map.Width && i <= (converted.X + camera.Width) / SizeValue; i++)
-                for (var j = (converted.Y - camera.Height) / SizeValue; j < map.Height && j <= converted.Y / SizeValue + 1; j++)
+                for (var j = futureJ; j < map.Height && j <= converted.Y / SizeValue + 1; j++)
                     switch (map.Level[i, j].Type)
                     {
                         case "Border":
@@ -220,7 +275,7 @@ namespace Project_Jumper
                             DrawMapElement(spike, g, i, j);
                             break;
                         case "Saw":
-                            DrawMapElement(RotateImage(saw, degrees * 4), g, i, j);
+                            DrawRotatedElement(saw, 4, g, i, j);
                             break;
                         case "JumpOrb":
                             DrawMapElement(jumpOrb, g, i, j);
@@ -231,9 +286,23 @@ namespace Project_Jumper
                         case "Finish":
                             DrawMapElement(finish, g, i, j);
                             break;
+                        case "CubePortal":
+                            DrawRotatedElement(cubePortal, 2, g, i, j);
+                            break;
+                        case "BallPortal":
+                            DrawRotatedElement(ballPortal, 2, g, i, j);
+                            break;
+                        case "JetPortal":
+                            DrawRotatedElement(jetPortal, 2, g, i, j);
+                            break;
                     }
             UpdatePlayerSkin();
             g.DrawImage(playerSkin, ApplyCameraOffset(player.X, player.Y));
+        }
+
+        private void DrawRotatedElement(Image image, int degreesMultiplier, Graphics g, int i, int j)
+        {
+            DrawMapElement(RotateImage(image, degrees * degreesMultiplier), g, i, j);
         }
 
         private void UpdatePlayerSkin()
@@ -283,7 +352,7 @@ namespace Project_Jumper
 
         private Point ApplyCameraOffset(int x, int y)
         {
-            var titleHeight = 17;
+            var screenConst = 40;
             var point = ConvertMathToWorld(x, y);
 
             camera.X = player.X - camera.Width / 2 + SizeValue;
@@ -293,8 +362,8 @@ namespace Project_Jumper
 
             camera.Y = (map.Height - 1) * SizeValue - player.Y - camera.Height / 2 + SizeValue / 2;
             if (camera.Y < 0) camera.Y = 0;
-            else if (camera.Y + camera.Height + titleHeight > map.Height * SizeValue)
-                camera.Y = map.Height * SizeValue - camera.Height - titleHeight;
+            else if (camera.Y + camera.Height + screenConst > map.Height * SizeValue)
+                camera.Y = map.Height * SizeValue - camera.Height - screenConst;
 
             point.X -= camera.X;
             point.Y -= camera.Y;

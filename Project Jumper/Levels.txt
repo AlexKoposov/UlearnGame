@@ -1,4 +1,4 @@
-166:39|
+0:09|
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 XF                                  X
 XF                                  X
@@ -10,8 +10,8 @@ X       *  B                        X
 X             *  * BBB              X
 X                         J    J    X
 X                        * *        X
-X                               BBB X
 X                                   X
+X                                BBBX
 X                                   X
 X                         BBBB      X
 X         B    J    B               X
@@ -19,7 +19,7 @@ X      B  B         B  J            X
 X   B  B  B         B               X
 X   BSSBSSBSSSSSSSSSBSSSSSSSSSSSSSSSX
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
--166:39|
+-0:12|
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 XFFB   *                            X
 X  B  *                             X
@@ -40,3 +40,24 @@ X      B                    *       X
 X   B  B                            X
 X   BSSBSSSSSSSSSSSSSSSSSSSSSSSSSSSSX
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+-0:10|
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+X   *                  BBBBBBBBBBBBBBBBX
+X  *                   O               X
+X *                    O               X
+X*             J       O     SSSSS     X
+X      BBB     *    BBBBBBBBBBBBBB     X
+X            *   *               B    *X
+X  J           G         *       B   * X
+X                 *SSSS*   *SSSSSB     X
+X      BBB         BBBB  J  BBBBBB     X
+X                     C          B*    X
+X* * * * * BBBBB      C          B *   X
+X              B      C          B     X
+X              B      C          B     X
+X              BBBBBBBB***       B    *X
+X              B                 B   * X
+X          BOOOB                 B     X
+X      B   B                SSSSSB     X
+X  BSSSBSSSB      SSSSBBBBBBBBBBBBFFFFFX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX

@@ -51,6 +51,7 @@ namespace Project_Jumper
         {
             ProcessCollisionX(map, size);
             ProcessCollisionY(map, size);
+            ReactToPortals(map, size);
         }
 
         public void Stop()
@@ -88,7 +89,7 @@ namespace Project_Jumper
         private void ApplyDefaultConditions(int size, int gravity, Gamemodes gameMode)
         {
             Gravity = gravity;
-            Velocity = size / 6;
+            Velocity = size / 7;
             MaxFallingVel = size / 4;
             MaxFlyingVel = Velocity;
             GameMode = gameMode;
@@ -121,6 +122,7 @@ namespace Project_Jumper
         {
             var k = ++FallTicks * 0.01;
             VelY += Gravity * (int)(-Velocity * k);
+            if (VelY == 0) VelY = -Gravity * Velocity / 3;
         }
 
         private void Fly()
@@ -286,6 +288,24 @@ namespace Project_Jumper
             StopJumping();
         }
 
+        private void ReactToPortals(Map map, int size)
+        {
+            var currentPos = new Point((int)Math.Round((double)X / size), (int)Math.Round((double)Y / size));
+            if (map.Level[currentPos.X, currentPos.Y].IsPortal)
+                switch (map.Level[currentPos.X, currentPos.Y].Type)
+                {
+                    case "CubePortal":
+                        GameMode = Gamemodes.Cube;
+                        break;
+                    case "BallPortal":
+                        GameMode = Gamemodes.Ball;
+                        break;
+                    case "JetPortal":
+                        GameMode = Gamemodes.Jetpack;
+                        break;
+                }
+        }
+
         private static bool CheckCollision(Map map, Point p1, Point p2)
         {
             return map.Level[p1.X, p1.Y].Collision
@@ -302,8 +322,11 @@ namespace Project_Jumper
         private void CheckFriendlyness(Map map, Point p1, Point p2)
         {
             if (!Dead)
-                Dead = !map.Level[p1.X, p1.Y].IsFriendly
-                      || !map.Level[p2.X, p2.Y].IsFriendly;
+            {
+                Dead = map.Level[p1.X, p1.Y].Collision && map.Level[p2.X, p2.Y].Collision
+                    ? !map.Level[p1.X, p1.Y].IsFriendly && !map.Level[p2.X, p2.Y].IsFriendly
+                    : !map.Level[p1.X, p1.Y].IsFriendly || !map.Level[p2.X, p2.Y].IsFriendly;
+            }
         }
 
         private void StopJumping()
