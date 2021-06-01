@@ -1,4 +1,4 @@
-0:09|
+166:39|
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 XF                                  X
 XF                                  X
@@ -19,7 +19,7 @@ X      B  B         B  J            X
 X   B  B  B         B               X
 X   BSSBSSBSSSSSSSSSBSSSSSSSSSSSSSSSX
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
--0:12|
+-166:39|
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 XFFB   *                            X
 X  B  *                             X
@@ -40,7 +40,7 @@ X      B                    *       X
 X   B  B                            X
 X   BSSBSSSSSSSSSSSSSSSSSSSSSSSSSSSSX
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
--0:10|
+-166:39|
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 X   *                  BBBBBBBBBBBBBBBBX
 X  *                   O               X
