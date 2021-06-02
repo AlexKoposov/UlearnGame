@@ -39,7 +39,7 @@ namespace Project_Jumper
             // GameTime
             // 
             this.GameTime.Enabled = true;
-            this.GameTime.Interval = 10;
+            this.GameTime.Interval = 15;
             this.GameTime.Tick += new System.EventHandler(this.Update);
             // 
             // LevelTime
@@ -51,7 +51,7 @@ namespace Project_Jumper
             // 
             this.TimeLabel.AutoSize = true;
             this.TimeLabel.Font = new System.Drawing.Font("Calibri", 48F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.TimeLabel.Location = new System.Drawing.Point(1056, 9);
+            this.TimeLabel.Location = new System.Drawing.Point(0, 0);
             this.TimeLabel.Name = "TimeLabel";
             this.TimeLabel.Size = new System.Drawing.Size(306, 78);
             this.TimeLabel.TabIndex = 0;
@@ -74,7 +74,7 @@ namespace Project_Jumper
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Load += new System.EventHandler(this.Update);
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.OnPaint);
-            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnPress);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnKeyDown);
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.OnKeyUp);
             this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnMouseDown);
             this.ResumeLayout(false);
@@ -84,8 +84,8 @@ namespace Project_Jumper
 
         #endregion
 
-        private System.Windows.Forms.Timer GameTime;
-        private System.Windows.Forms.Timer LevelTime;
+        public System.Windows.Forms.Timer GameTime;
+        public System.Windows.Forms.Timer LevelTime;
         private System.Windows.Forms.Label TimeLabel;
     }
 }

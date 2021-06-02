@@ -7,12 +7,12 @@ namespace Project_Jumper
 {
     public partial class GameWindow : Form
     {
+        public Rectangle screen;
+        public Map map { get; private set; }
         private readonly int SizeValue;
         private readonly Size BlockSize;
-        private Rectangle screen;
         private string currentPath;
         private Player player;
-        private Map map;
         private Image playerSkin, border, block, spike, saw, jumpOrb, gravityOrb, finish, timerBackground, cubePortal, ballPortal, jetPortal;
         private int degrees;
         private Rectangle camera;
@@ -23,6 +23,7 @@ namespace Project_Jumper
             InitializeComponent();
 
             screen = Screen.FromControl(this).WorkingArea;
+            screen.Height += 40;
             SizeValue = Screen.FromControl(this).WorkingArea.Height / 11;
             BlockSize = new Size(new Point(SizeValue, SizeValue));
 
@@ -57,7 +58,7 @@ namespace Project_Jumper
             }
         }
 
-        public void OnPress(object sender, KeyEventArgs e)
+        public void OnKeyDown(object sender, KeyEventArgs e)
         {
             switch (e.KeyCode)
             {
@@ -86,10 +87,13 @@ namespace Project_Jumper
                     Restart();
                     break;
                 case Keys.Escape:
-                    Close();
+                    GameTime.Stop();
+                    LevelTime.Stop();
+                    PauseGame();
                     break;
 
                 //DevTools
+                
                 case Keys.D1:
                     player.GameMode = Gamemodes.Cube;
                     DisableFlying();
@@ -101,18 +105,24 @@ namespace Project_Jumper
                 case Keys.D3:
                     player.GameMode = Gamemodes.Jetpack;
                     break;
-                case Keys.D0:
-                    map.ResetBestTime();
-                    break;
-                case Keys.NumPad6:
-                    map.ChangeToNextLevel();
-                    Restart();
-                    break;
-                case Keys.NumPad4:
-                    map.ChangeToPrevLevel();
-                    Restart();
-                    break;
+                //case Keys.D0:
+                //    map.ResetBestTime();
+                //    break;
+                //case Keys.NumPad6:
+                //    map.ChangeToNextLevel();
+                //    Restart();
+                //    break;
+                //case Keys.NumPad4:
+                //    map.ChangeToPrevLevel();
+                //    Restart();
+                //    break;
             }
+        }
+
+        private void PauseGame()
+        {
+            var pause = new PauseWindow();
+            pause.Show();
         }
 
         public void OnMouseDown(object sender, MouseEventArgs e)
@@ -352,7 +362,6 @@ namespace Project_Jumper
 
         private Point ApplyCameraOffset(int x, int y)
         {
-            var screenConst = 40;
             var point = ConvertMathToWorld(x, y);
 
             camera.X = player.X - camera.Width / 2 + SizeValue;
@@ -362,8 +371,8 @@ namespace Project_Jumper
 
             camera.Y = (map.Height - 1) * SizeValue - player.Y - camera.Height / 2 + SizeValue / 2;
             if (camera.Y < 0) camera.Y = 0;
-            else if (camera.Y + camera.Height + screenConst > map.Height * SizeValue)
-                camera.Y = map.Height * SizeValue - camera.Height - screenConst;
+            else if (camera.Y + camera.Height > map.Height * SizeValue)
+                camera.Y = map.Height * SizeValue - camera.Height;
 
             point.X -= camera.X;
             point.Y -= camera.Y;

@@ -30,3 +30,4 @@ C:\Users\Trixter\Downloads\UlearnGame-ea870371e8ff94bc3d76f99d37bf9ffba1171f91\U
 C:\Users\Trixter\Downloads\UlearnGame-ea870371e8ff94bc3d76f99d37bf9ffba1171f91\UlearnGame-ea870371e8ff94bc3d76f99d37bf9ffba1171f91\Project Jumper\obj\Debug\netcoreapp3.1\Project Jumper.genruntimeconfig.cache
 C:\Users\Trixter\Documents\GitHub\UlearnGame\Project Jumper\obj\Debug\netcoreapp3.1\Project_Jumper.GameWindow.resources
 C:\Users\Trixter\Documents\GitHub\UlearnGame\Project Jumper\obj\Debug\netcoreapp3.1\Project Jumper.csproj.AssemblyReference.cache
+C:\Users\Trixter\Documents\GitHub\UlearnGame\Project Jumper\obj\Debug\netcoreapp3.1\Project_Jumper.PauseWindow.resources
