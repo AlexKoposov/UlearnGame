@@ -7,14 +7,14 @@ XBBBB                               X
 X       J                           X
 X    *         J                    X
 X       *  B                        X
-X             *  * BBB              X
+X             *  * BBBB             X
 X                         J    J    X
 X                        * *        X
 X                                   X
 X                                BBBX
 X                                   X
 X                         BBBB      X
-X         B    J    B               X
+X         B    J                    X
 X      B  B         B  J            X
 X   B  B  B         B               X
 X   BSSBSSBSSSSSSSSSBSSSSSSSSSSSSSSSX
@@ -25,10 +25,10 @@ XFFB   *                            X
 X  B  *                             X
 X  B *                              X
 X  B*           BBB    J            X
-X  B            B          BB       X
+X  B            B          BBB      X
 X               B * * *             X
 X         B * * B                BBBX
-X   G     B                  J      X
+X   G     B                   J     X
 X         B          G              X
 X         BSSSSSS                   X
 X * * * * BBBBBBB     BBBBB      *  X
@@ -45,10 +45,10 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 X   *                  BBBBBBBBBBBBBBBBX
 X  *                   O               X
 X *                    O               X
-X*             J       O     SSSSS     X
-X      BBB     *    BBBBBBBBBBBBBB     X
-X            *   *               B    *X
-X  J           G         *       B   * X
+X*          J   J      O     SSSSS     X
+X      BBB   * *    BBBBBBBBBBBBBB     X
+X                *               B    *X
+X   J          G         *       B   * X
 X                 *SSSS*   *SSSSSB     X
 X      BBB         BBBB  J  BBBBBB     X
 X                     C          B*    X
@@ -56,7 +56,7 @@ X* * * * * BBBBB      C          B *   X
 X              B      C          B     X
 X              B      C          B     X
 X              BBBBBBBB***       B    *X
-X              B                 B   * X
+X              B                 B     X
 X          BOOOB                 B     X
 X      B   B                SSSSSB     X
 X  BSSSBSSSB      SSSSBBBBBBBBBBBBFFFFFX

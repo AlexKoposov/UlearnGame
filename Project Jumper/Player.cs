@@ -89,7 +89,7 @@ namespace Project_Jumper
         private void ApplyDefaultConditions(int size, int gravity, Gamemodes gameMode)
         {
             Gravity = gravity;
-            Velocity = size / 7;
+            Velocity = size / 8;
             MaxFallingVel = size / 4;
             MaxFlyingVel = Velocity;
             GameMode = gameMode;

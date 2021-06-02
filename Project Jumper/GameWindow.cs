@@ -7,27 +7,31 @@ namespace Project_Jumper
 {
     public partial class GameWindow : Form
     {
-        public Rectangle screen;
-        public Map map { get; private set; }
+        public Rectangle Screen;
+        public bool PauseIsOpened { get; set; }
+        public Map Map { get; private set; }
+        public string CurrentPath { get; private set; }
         private readonly int SizeValue;
         private readonly Size BlockSize;
-        private string currentPath;
         private Player player;
-        private Image playerSkin, border, block, spike, saw, jumpOrb, gravityOrb, finish, timerBackground, cubePortal, ballPortal, jetPortal;
-        private int degrees;
+        private Image playerSkin, cubeSkin, ballSkin, jetSkin, border, block, spike, saw, rotatedSaw,
+            jumpOrb, gravityOrb, finish, timerBackground, cubePortal, rotatedCubePortal, ballPortal,
+            rotatedBallPortal, jetPortal, rotatedJetPortal;
+        private int degrees, lastSawRotation, lastCubePortalRotation,
+            lastBallPortalRotation, lastJetPortalRotation;
         private Rectangle camera;
         private bool playerLastMoveWasRight = true;
+        private PauseWindow pause;
 
         public GameWindow()
         {
-            InitializeComponent();
-
-            screen = Screen.FromControl(this).WorkingArea;
-            screen.Height += 40;
-            SizeValue = Screen.FromControl(this).WorkingArea.Height / 11;
+            Screen = System.Windows.Forms.Screen.FromControl(this).WorkingArea;
+            Screen.Height += 40;
+            SizeValue = Screen.Height / 11;
             BlockSize = new Size(new Point(SizeValue, SizeValue));
 
-            Initialise();
+            InitializeComponent();
+            InitialiseForm();
         }
 
         public void OnKeyUp(object sender, KeyEventArgs e)
@@ -87,13 +91,11 @@ namespace Project_Jumper
                     Restart();
                     break;
                 case Keys.Escape:
-                    GameTime.Stop();
-                    LevelTime.Stop();
                     PauseGame();
                     break;
 
                 //DevTools
-                
+
                 case Keys.D1:
                     player.GameMode = Gamemodes.Cube;
                     DisableFlying();
@@ -105,24 +107,29 @@ namespace Project_Jumper
                 case Keys.D3:
                     player.GameMode = Gamemodes.Jetpack;
                     break;
-                //case Keys.D0:
-                //    map.ResetBestTime();
-                //    break;
-                //case Keys.NumPad6:
-                //    map.ChangeToNextLevel();
-                //    Restart();
-                //    break;
-                //case Keys.NumPad4:
-                //    map.ChangeToPrevLevel();
-                //    Restart();
-                //    break;
+                    //case Keys.D0:
+                    //    map.ResetBestTime();
+                    //    break;
+                    //case Keys.NumPad6:
+                    //    LoadNextLevel();
+                    //    break;
+                    //case Keys.NumPad4:
+                    //    LoadPrevLevel();
+                    //    return;
+                    //    break;
             }
         }
 
-        private void PauseGame()
+        public void LoadPrevLevel()
         {
-            var pause = new PauseWindow();
-            pause.Show();
+            Map.ChangeToPrevLevel();
+            Restart();
+        }
+
+        public void LoadNextLevel()
+        {
+            Map.ChangeToNextLevel();
+            Restart();
         }
 
         public void OnMouseDown(object sender, MouseEventArgs e)
@@ -135,30 +142,46 @@ namespace Project_Jumper
         {
             degrees += 1;
             player.TriggerTicks++;
+
             if (player.IsLevelCompleted
                 && !player.IsMessageShowed)
             {
                 player.IsMessageShowed = true;
                 player.Stop();
                 LevelTime.Stop();
-                map.UpdateBestTime();
+                Map.UpdateBestTime();
                 ShowMessage();
-                map.ChangeToNextLevel();
+                Map.ChangeToNextLevel();
                 Restart();
             }
-            if (player.Dead)
-                Restart();
-            if (player.TriggerTicks != 0)
-                player.ReactToOrbs(map, SizeValue);
+
+            if (player.Dead) Restart();
+
+            if (player.TriggerTicks != 0) player.ReactToOrbs(Map, SizeValue);
+
             if (player.Moving)
             {
                 if (LevelTime.Enabled)
-                    player.Move(map, SizeValue);
+                    player.Move(Map, SizeValue);
                 else LevelTime.Start();
             }
 
             UpdateTimeLabel();
             Invalidate();
+        }
+
+        private void PauseGame()
+        {
+            if (!PauseIsOpened)
+            {
+                if (pause == null)
+                    pause = new PauseWindow();
+                PauseIsOpened = true;
+                GameTime.Stop();
+                LevelTime.Stop();
+                pause.Show();
+                Cursor.Show();
+            }
         }
 
         private void GoRight()
@@ -188,6 +211,13 @@ namespace Project_Jumper
             player.Flying = false;
         }
 
+        private void Restart()
+        {
+            player = new Player(Map.StartPosition, SizeValue);
+            LevelTime.Stop();
+            Map.ResetTime();
+        }
+
         private void TriggerReadyAction()
         {
             player.TriggerTicks = 0;
@@ -200,19 +230,21 @@ namespace Project_Jumper
             else player.Jumping = true;
         }
 
-        private void Initialise()
+        private void InitialiseForm()
         {
-            currentPath = new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName.ToString();
+            CurrentPath = new DirectoryInfo(Directory.GetCurrentDirectory())
+                .Parent.Parent.Parent.FullName.ToString();
             GetAllSprites();
-            map = new Map();
-            player = new Player(map.StartPosition, SizeValue);
-            camera = new Rectangle(new Point(0, 0), screen.Size);
+            Map = new Map();
+            player = new Player(Map.StartPosition, SizeValue);
+            camera = new Rectangle(new Point(0, 0), Screen.Size);
             GameTime.Start();
+            Cursor.Hide();
         }
 
         private void GetAllSprites()
         {
-            GetSprite(ref playerSkin, "Cube");
+            GetSprite(ref cubeSkin, "Cube");
             GetSprite(ref border, "Border");
             GetSprite(ref block, "Block");
             GetSprite(ref spike, "Spike");
@@ -224,56 +256,53 @@ namespace Project_Jumper
             GetSprite(ref cubePortal, "GreenPortal");
             GetSprite(ref ballPortal, "RedPortal");
             GetSprite(ref jetPortal, "PurplePortal");
+            GetSprite(ref cubeSkin, "Cube");
+            GetSprite(ref ballSkin, "Ball");
+            GetSprite(ref jetSkin, "Jetpack");
         }
 
         private void GetSprite(ref Image inGameSprite, string spriteName)
         {
-            inGameSprite = FitInSize(new Bitmap(Path.Combine(currentPath, $"Resources\\{spriteName}.png")));
+            ImageExtensions.GetSprite(ref inGameSprite, spriteName, CurrentPath, BlockSize);
         }
 
         private void UpdateTimeLabel()
         {
-            var time = map.LevelTimeSeconds;
+            var time = Map.LevelTimeSeconds;
             TimeLabel.Text = LevelConverter.ConvertToDefaultTime(time);
-            TimeLabel.Location = new Point(screen.Width - TimeLabel.Size.Width + 1, 0);
+            TimeLabel.Location = new Point(Screen.Width - TimeLabel.Size.Width + 1, 0);
             TimeLabel.Image = new Bitmap(timerBackground, TimeLabel.Size);
         }
 
         private void LevelTime_Tick(object sender, EventArgs e)
         {
-            map.IncreaseTime();
+            Map.IncreaseTime();
         }
 
         private void ShowMessage()
         {
-            var time = map.LevelTimeSeconds;
+            var time = Map.LevelTimeSeconds;
             MessageBox.Show(@$"Вы победили!
 Ваше время: {LevelConverter.ConvertToDefaultTime(time)}
-Лучшее время: {LevelConverter.ConvertToDefaultTime(map.BestLevelTime)}");
-        }
-
-        private void Restart()
-        {
-            player = new Player(map.StartPosition, SizeValue);
-            LevelTime.Stop();
-            map.ResetTime();
+Лучшее время: {LevelConverter.ConvertToDefaultTime(Map.BestLevelTime)}");
         }
 
         private void OnPaint(object sender, PaintEventArgs e)
         {
             Graphics g = e.Graphics;
+            UpdateCamera();
             DrawMap(g);
         }
 
         private void DrawMap(Graphics g)
         {
             var converted = ConvertMathToWorld(camera.X, camera.Y);
-            var futureJ = (converted.Y - camera.Height) / SizeValue;
-            if (futureJ < 0)
-                futureJ = 0;
-            for (var i = converted.X / SizeValue; i < map.Width && i <= (converted.X + camera.Width) / SizeValue; i++)
-                for (var j = futureJ; j < map.Height && j <= converted.Y / SizeValue + 1; j++)
-                    switch (map.Level[i, j].Type)
+            var mapY = (converted.Y - camera.Height) / SizeValue;
+            if (mapY < 0) mapY = 0;
+            for (var i = converted.X / SizeValue; i < Map.Width
+                && i <= (converted.X + camera.Width) / SizeValue; i++)
+                for (var j = mapY; j < Map.Height && j <= converted.Y / SizeValue; j++)
+                    switch (Map.Level[i, j].Type)
                     {
                         case "Border":
                             DrawMapElement(border, g, i, j);
@@ -285,7 +314,8 @@ namespace Project_Jumper
                             DrawMapElement(spike, g, i, j);
                             break;
                         case "Saw":
-                            DrawRotatedElement(saw, 4, g, i, j);
+                            UpdateRotatedImage(saw, ref rotatedSaw, ref lastSawRotation, 3);
+                            DrawMapElement(rotatedSaw, g, i, j);
                             break;
                         case "JumpOrb":
                             DrawMapElement(jumpOrb, g, i, j);
@@ -297,22 +327,29 @@ namespace Project_Jumper
                             DrawMapElement(finish, g, i, j);
                             break;
                         case "CubePortal":
-                            DrawRotatedElement(cubePortal, 2, g, i, j);
+                            UpdateRotatedImage(cubePortal, ref rotatedCubePortal, ref lastCubePortalRotation, 1);
+                            DrawMapElement(rotatedCubePortal, g, i, j);
                             break;
                         case "BallPortal":
-                            DrawRotatedElement(ballPortal, 2, g, i, j);
+                            UpdateRotatedImage(ballPortal, ref rotatedBallPortal, ref lastBallPortalRotation, 1);
+                            DrawMapElement(rotatedBallPortal, g, i, j);
                             break;
                         case "JetPortal":
-                            DrawRotatedElement(jetPortal, 2, g, i, j);
+                            UpdateRotatedImage(jetPortal, ref rotatedJetPortal, ref lastJetPortalRotation, 1);
+                            DrawMapElement(rotatedJetPortal, g, i, j);
                             break;
                     }
             UpdatePlayerSkin();
             g.DrawImage(playerSkin, ApplyCameraOffset(player.X, player.Y));
         }
 
-        private void DrawRotatedElement(Image image, int degreesMultiplier, Graphics g, int i, int j)
+        private void UpdateRotatedImage(Image originalImg, ref Image rotatedImg, ref int lastRotation, int degrees)
         {
-            DrawMapElement(RotateImage(image, degrees * degreesMultiplier), g, i, j);
+            if (this.degrees != lastRotation)
+            {
+                rotatedImg = ImageExtensions.RotateImage(originalImg, this.degrees * degrees);
+                lastRotation = this.degrees;
+            }
         }
 
         private void UpdatePlayerSkin()
@@ -320,33 +357,19 @@ namespace Project_Jumper
             switch (player.GameMode)
             {
                 case Gamemodes.Ball:
-                    GetSprite(ref playerSkin, "Ball");
+                    playerSkin = ballSkin;
                     break;
                 case Gamemodes.Jetpack:
-                    GetSprite(ref playerSkin, "Jetpack");
+                    playerSkin = new Bitmap(jetSkin);
                     if (playerLastMoveWasRight)
                         playerSkin.RotateFlip(RotateFlipType.RotateNoneFlipX);
                     if (player.Gravity == -1)
                         playerSkin.RotateFlip(RotateFlipType.RotateNoneFlipY);
                     break;
                 default:
-                    GetSprite(ref playerSkin, "Cube");
+                    playerSkin = cubeSkin;
                     break;
             }
-        }
-
-        private static Bitmap RotateImage(Image image, float angle)
-        {
-            if (image == null) throw new ArgumentNullException();
-            PointF offset = new PointF((float)image.Width / 2, (float)image.Height / 2);
-            Bitmap rotatedBmp = new Bitmap(image.Width, image.Height);
-            rotatedBmp.SetResolution(image.HorizontalResolution, image.VerticalResolution);
-            Graphics g = Graphics.FromImage(rotatedBmp);
-            g.TranslateTransform(offset.X, offset.Y);
-            g.RotateTransform(angle);
-            g.TranslateTransform(-offset.X, -offset.Y);
-            g.DrawImage(image, new PointF(0, 0));
-            return rotatedBmp;
         }
 
         private void DrawMapElement(Image e, Graphics g, int i, int j)
@@ -354,29 +377,28 @@ namespace Project_Jumper
             g.DrawImage(e, ApplyCameraOffset(i * SizeValue, j * SizeValue));
         }
 
-        private Image FitInSize(Image image) =>
-            new Bitmap(image, BlockSize);
-
         private Point ConvertMathToWorld(int x, int y) =>
-            new Point(x, (map.Height - 1) * SizeValue - y);
+            new Point(x, Map.Height * SizeValue - y);
 
         private Point ApplyCameraOffset(int x, int y)
         {
             var point = ConvertMathToWorld(x, y);
+            point.X -= camera.X;
+            point.Y -= camera.Y + SizeValue;
+            return point;
+        }
 
+        private void UpdateCamera()
+        {
             camera.X = player.X - camera.Width / 2 + SizeValue;
             if (camera.X < 0) camera.X = 0;
-            else if (camera.X + camera.Width > map.Width * SizeValue)
-                camera.X = map.Width * SizeValue - camera.Width;
+            else if (camera.X + camera.Width > Map.Width * SizeValue)
+                camera.X = Map.Width * SizeValue - camera.Width;
 
-            camera.Y = (map.Height - 1) * SizeValue - player.Y - camera.Height / 2 + SizeValue / 2;
+            camera.Y = Map.Height * SizeValue - player.Y - camera.Height / 2 + SizeValue / 2;
             if (camera.Y < 0) camera.Y = 0;
-            else if (camera.Y + camera.Height > map.Height * SizeValue)
-                camera.Y = map.Height * SizeValue - camera.Height;
-
-            point.X -= camera.X;
-            point.Y -= camera.Y;
-            return point;
+            else if (camera.Y + camera.Height > Map.Height * SizeValue)
+                camera.Y = Map.Height * SizeValue - camera.Height;
         }
     }
 }

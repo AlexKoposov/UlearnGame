@@ -39,7 +39,7 @@ namespace Project_Jumper
             // GameTime
             // 
             this.GameTime.Enabled = true;
-            this.GameTime.Interval = 15;
+            this.GameTime.Interval = 10;
             this.GameTime.Tick += new System.EventHandler(this.Update);
             // 
             // LevelTime
@@ -65,6 +65,7 @@ namespace Project_Jumper
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.ClientSize = new System.Drawing.Size(1184, 661);
             this.Controls.Add(this.TimeLabel);
+            this.Cursor = System.Windows.Forms.Cursors.Default;
             this.DoubleBuffered = true;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));

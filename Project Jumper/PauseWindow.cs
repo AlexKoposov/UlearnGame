@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 
 namespace Project_Jumper
@@ -12,36 +8,47 @@ namespace Project_Jumper
     {
         private Rectangle screen;
         private new readonly GameWindow Parent;
+        private Image continueBtnSprite, nextBtnSprite, prevBtnSprite;
 
         public PauseWindow()
         {
             Parent = (GameWindow)Application.OpenForms["GameWindow"];
-            screen = Parent.screen;
+            screen = Parent.Screen;
             InitializeComponent();
             UpdateComponent();
         }
 
         private void UpdateComponent()
         {
-            //BackgroundImage = 
+            Title.Font = new Font("Arial", 160F, FontStyle.Bold, GraphicsUnit.Point);
+            Title.Location = new Point((screen.Width - Title.Size.Width) / 2 + 1, 0);
 
-            Title.Location = new Point((screen.Width - Title.Size.Width) / 2, 0);
+            var contBtnSize = screen.Height / 3;
+            ContinueButton.Size = new Size(contBtnSize, contBtnSize);
+            ContinueButton.Location = new Point((screen.Width - ContinueButton.Size.Width) / 2,
+                (screen.Height - ContinueButton.Height) / 2);
+            ImageExtensions.GetSprite(ref continueBtnSprite, "Continue", Parent.CurrentPath, ContinueButton.Size);
+            ContinueButton.Image = continueBtnSprite;
 
-            ContinueButton.Size = new Size(screen.Height / 3, screen.Height / 3);
-            ContinueButton.Location = new Point((screen.Width - ContinueButton.Size.Width) / 2, (screen.Height - ContinueButton.Size.Height) / 3);
+            var nextLvlBtnSize = ContinueButton.Height * 2 / 3;
+            NextLevelButton.Size = new Size(nextLvlBtnSize, nextLvlBtnSize);
+            NextLevelButton.Location = new Point(ContinueButton.Right + screen.Width / 10,
+                ContinueButton.Top + (ContinueButton.Height - NextLevelButton.Height) / 2);
+            ImageExtensions.GetSprite(ref nextBtnSprite, "Next", Parent.CurrentPath, NextLevelButton.Size);
+            NextLevelButton.Image = nextBtnSprite;
 
-            ExitButton.Location = new Point((screen.Width - ExitButton.Size.Width) / 2, ContinueButton.Bottom + screen.Height / 10);
+            PrevLevelButton.Size = NextLevelButton.Size;
+            PrevLevelButton.Location = new Point(ContinueButton.Left - (screen.Width / 10 + PrevLevelButton.Size.Width),
+                ContinueButton.Top + (ContinueButton.Height - NextLevelButton.Height) / 2);
+            prevBtnSprite = new Bitmap(nextBtnSprite);
+            prevBtnSprite.RotateFlip(RotateFlipType.RotateNoneFlipX);
+            PrevLevelButton.Image = prevBtnSprite;
 
-            PrevLevelButton.Location = new Point(ExitButton.Left - (screen.Width / 5 + PrevLevelButton.Size.Width), ExitButton.Top);
+            ExitButton.Location = new Point((screen.Width - ExitButton.Size.Width) / 2,
+                screen.Bottom - (ExitButton.Height + screen.Height / 20));
 
-            NextLevelButton.Location = new Point(ExitButton.Right + screen.Width / 5, ExitButton.Top);
-
-            ResetTimeButton.Location = new Point((screen.Width - ResetTimeButton.Size.Width) / 2, ExitButton.Bottom + screen.Height / 10);
-        }
-
-        private void PauseWindow_Load(object sender, EventArgs e)
-        {
-
+            ResetTimeButton.Location = new Point(screen.Width -
+                (screen.Width / 20 + ResetTimeButton.Width), ExitButton.Top);
         }
 
         private void ExitButton_Click(object sender, EventArgs e)
@@ -56,27 +63,31 @@ namespace Project_Jumper
 
         private void NextLevelButton_Click(object sender, EventArgs e)
         {
-            Parent.map.ChangeToNextLevel();
+            Parent.LoadNextLevel();
             ExitForm();
         }
 
         private void PrevLevelButton_Click(object sender, EventArgs e)
         {
-            Parent.map.ChangeToPrevLevel();
+            Parent.LoadPrevLevel();
             ExitForm();
         }
 
         private void ResetTimeButton_Click(object sender, EventArgs e)
         {
-            Parent.map.ResetBestTime();
+            Parent.Map.ResetBestTime();
             ExitForm();
         }
 
         private void ExitForm()
         {
+            Parent.PauseIsOpened = false;
             Parent.GameTime.Start();
-            Parent.LevelTime.Start();
-            Close();
+            if (Parent.Map.LevelTimeSeconds != 0)
+                Parent.LevelTime.Start();
+            Cursor.Hide();
+            Parent.Show();
+            Hide();
         }
     }
 }
