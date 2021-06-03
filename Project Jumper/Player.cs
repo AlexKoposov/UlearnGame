@@ -18,7 +18,7 @@ namespace Project_Jumper
         public int FlyTicks { get; set; }
         public int TriggerTicks { get; set; }
         public Gamemodes GameMode { get; set; }
-        public int Gravity { get; set; }
+        public int Gravity { get; private set; }
         public int X { get; private set; }
         public int Y { get; private set; }
         public int VelX { get; private set; }

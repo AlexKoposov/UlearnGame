@@ -26,7 +26,7 @@ namespace Project_Jumper_Tests
         [Test]
         public void MoveRightWithChangedGravity()
         {
-            var player = new Player(new Point(1, 1), 10) { MovingRight = true, Gravity = -1 };
+            var player = new Player(new Point(1, 1), 10, Gamemodes.Cube, -1) { MovingRight = true };
             var prevX = player.X;
             player.Move(map, 10);
             Assert.IsTrue(prevX < player.X);
@@ -44,7 +44,7 @@ namespace Project_Jumper_Tests
         [Test]
         public void MoveLeftWithChangedGravity()
         {
-            var player = new Player(new Point(2, 1), 10) { MovingLeft = true, Gravity = -1 };
+            var player = new Player(new Point(2, 1), 10, Gamemodes.Cube, -1) { MovingLeft = true };
             var prevX = player.X;
             player.Move(map, 10);
             Assert.IsTrue(prevX > player.X);
@@ -63,7 +63,7 @@ namespace Project_Jumper_Tests
         [Test]
         public void FallWithChangedGravity()
         {
-            var player = new Player(new Point(1, 2), 10) { Falling = true, Gravity = -1 };
+            var player = new Player(new Point(1, 2), 10, Gamemodes.Cube, -1) { Falling = true };
             var prevY = player.Y;
             for (var i = 0; i < 100; i++)
                 player.Move(map, 10);
@@ -92,7 +92,7 @@ namespace Project_Jumper_Tests
         [Test]
         public void NotJumpWhenFallingWithChangedGravity()
         {
-            var player = new Player(new Point(1, 2), 10) { Jumping = true, Falling = true, Gravity = -1 };
+            var player = new Player(new Point(1, 2), 10, Gamemodes.Cube, -1) { Jumping = true, Falling = true };
             var prevY = player.Y;
             for (var i = 0; i < 100; i++)
                 player.Move(map, 10);
@@ -102,7 +102,7 @@ namespace Project_Jumper_Tests
         [Test]
         public void JumpWithChangedGravity()
         {
-            var player = new Player(new Point(1, 2), 10) { Jumping = true, Gravity = -1 };
+            var player = new Player(new Point(1, 2), 10, Gamemodes.Cube, -1) { Jumping = true };
             var prevY = player.Y;
             player.Move(map, 10);
             Assert.IsTrue(prevY > player.Y);
@@ -136,7 +136,7 @@ namespace Project_Jumper_Tests
         public void StopWhenCollideWithChangedGravity(int x, int y, int dirX, int dirY)
         {
             map.ChangeToNextLevel();
-            var player = new Player(new Point(x, y), 10) { Gravity = -1 };
+            var player = new Player(new Point(x, y), 10, Gamemodes.Cube, -1);
             if (dirX > 0) player.MovingRight = true;
             if (dirX < 0) player.MovingLeft = true;
             if (dirY < 0) player.Falling = true;
@@ -160,7 +160,7 @@ namespace Project_Jumper_Tests
         [Test]
         public void JumpOnJumpOrbWithChangedGravity()
         {
-            var player = new Player(new Point(15, 4), 10) { TriggerTicks = 1, Gravity = -1 };
+            var player = new Player(new Point(15, 4), 10, Gamemodes.Cube, -1) { TriggerTicks = 1 };
             var prevY = player.Y;
             player.ReactToOrbs(map, 10);
             player.Move(map, 10);
@@ -180,7 +180,7 @@ namespace Project_Jumper_Tests
         public void ChangeGravityOnGravityOrbWithChangedGravity()
         {
             map.ChangeToNextLevel();
-            var player = new Player(new Point(10, 4), 10) { TriggerTicks = 1, Gravity = -1 };
+            var player = new Player(new Point(10, 4), 10, Gamemodes.Cube, -1) { TriggerTicks = 1 };
             player.ReactToOrbs(map, 10);
             Assert.IsTrue(player.Gravity == 1);
         }
@@ -198,7 +198,7 @@ namespace Project_Jumper_Tests
         public void DieOnSpikesWithChangedGravity()
         {
             map.ChangeToNextLevel();
-            var player = new Player(new Point(17, 9), 10) { Falling = true, MovingLeft = true, Gravity = -1 };
+            var player = new Player(new Point(17, 9), 10, Gamemodes.Cube, -1) { Falling = true, MovingLeft = true };
             for (var i = 0; i < 100; i++)
                 player.Move(map, 10);
             Assert.IsTrue(player.Dead);
@@ -218,7 +218,7 @@ namespace Project_Jumper_Tests
         public void DieOnSawsWithChangedGravity()
         {
             map.ChangeToNextLevel();
-            var player = new Player(new Point(2, 7), 10) { Falling = true, Gravity = -1 };
+            var player = new Player(new Point(2, 7), 10, Gamemodes.Cube, -1) { Falling = true };
             for (var i = 0; i < 100; i++)
                 player.Move(map, 10);
             Assert.IsTrue(player.Dead);

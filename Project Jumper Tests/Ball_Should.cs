@@ -27,7 +27,7 @@ namespace Project_Jumper_Tests
         [Test]
         public void NotJumpWithChangedGravity()
         {
-            var player = new Player(new Point(1, 14), 10, Gamemodes.Ball) { Jumping = true, Gravity = -1 };
+            var player = new Player(new Point(1, 14), 10, Gamemodes.Ball, -1) { Jumping = true };
             var prevY = player.Y;
             for (var i = 0; i < 10000; i++)
                 player.Move(map, 10);
@@ -45,7 +45,7 @@ namespace Project_Jumper_Tests
         [Test]
         public void ChamgeGravityWithChangedGravity()
         {
-            var player = new Player(new Point(1, 14), 10, Gamemodes.Ball) { Jumping = true, Gravity = -1 };
+            var player = new Player(new Point(1, 14), 10, Gamemodes.Ball, -1) { Jumping = true };
             player.Move(map, 10);
             Assert.IsTrue(player.Gravity == 1);
         }
