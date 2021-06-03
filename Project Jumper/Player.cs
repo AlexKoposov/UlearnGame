@@ -14,7 +14,6 @@ namespace Project_Jumper
         public bool Flying { get; set; }
         public bool Dead { get; set; }
         public bool IsLevelCompleted { get; set; }
-        public bool IsMessageShowed { get; set; }
         public int FallTicks { get; set; }
         public int FlyTicks { get; set; }
         public int TriggerTicks { get; set; }
@@ -54,13 +53,6 @@ namespace Project_Jumper
             ReactToPortals(map, size);
         }
 
-        public void Stop()
-        {
-            MovingLeft = false;
-            MovingRight = false;
-            StopJumping();
-        }
-
         public void ReactToOrbs(Map map, int size)
         {
             if (TriggerTicks != 0 && TriggerTicks <= 15)
@@ -90,7 +82,7 @@ namespace Project_Jumper
         {
             Gravity = gravity;
             Velocity = size / 8;
-            MaxFallingVel = size / 4;
+            MaxFallingVel = size / 5;
             MaxFlyingVel = Velocity;
             GameMode = gameMode;
         }

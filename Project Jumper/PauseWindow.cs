@@ -20,7 +20,7 @@ namespace Project_Jumper
 
         private void UpdateComponent()
         {
-            Title.Font = new Font("Arial", 160F, FontStyle.Bold, GraphicsUnit.Point);
+            Title.Font = new Font("Arial", 160F * screen.Width / 1920, FontStyle.Bold, GraphicsUnit.Point);
             Title.Location = new Point((screen.Width - Title.Size.Width) / 2 + 1, 0);
 
             var contBtnSize = screen.Height / 3;
@@ -44,9 +44,11 @@ namespace Project_Jumper
             prevBtnSprite.RotateFlip(RotateFlipType.RotateNoneFlipX);
             PrevLevelButton.Image = prevBtnSprite;
 
+            ExitButton.Font = new Font("Arial", 48F * screen.Width / 1920, FontStyle.Bold, GraphicsUnit.Point);
             ExitButton.Location = new Point((screen.Width - ExitButton.Size.Width) / 2,
                 screen.Bottom - (ExitButton.Height + screen.Height / 20));
 
+            ResetTimeButton.Font = new Font("Arial", 25F * screen.Width / 1920, FontStyle.Bold, GraphicsUnit.Point);
             ResetTimeButton.Location = new Point(screen.Width -
                 (screen.Width / 20 + ResetTimeButton.Width), ExitButton.Top);
         }

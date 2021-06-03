@@ -20,7 +20,7 @@ namespace Project_Jumper
         private int degrees, lastSawRotation, lastCubePortalRotation,
             lastBallPortalRotation, lastJetPortalRotation;
         private Rectangle camera;
-        private bool playerLastMoveWasRight = true;
+        private bool playerLastMoveWasRight = true, IsMessageShowed;
         private PauseWindow pause;
 
         public GameWindow()
@@ -83,6 +83,8 @@ namespace Project_Jumper
                     break;
                 case Keys.Space:
                     JumpAction();
+                    if (IsMessageShowed)
+                        FinishMessageAction();
                     break;
                 case Keys.Up:
                     JumpAction();
@@ -91,7 +93,14 @@ namespace Project_Jumper
                     Restart();
                     break;
                 case Keys.Escape:
-                    PauseGame();
+                    if (!IsMessageShowed)
+                        PauseGame();
+                    if (IsMessageShowed)
+                        FinishMessageAction();
+                    break;
+                case Keys.Enter:
+                    if (IsMessageShowed)
+                        FinishMessageAction();
                     break;
 
                 //DevTools
@@ -143,16 +152,14 @@ namespace Project_Jumper
             degrees += 1;
             player.TriggerTicks++;
 
-            if (player.IsLevelCompleted
-                && !player.IsMessageShowed)
+            if (player.IsLevelCompleted && !IsMessageShowed)
             {
-                player.IsMessageShowed = true;
-                player.Stop();
                 LevelTime.Stop();
+                GameTime.Stop();
                 Map.UpdateBestTime();
                 ShowMessage();
-                Map.ChangeToNextLevel();
-                Restart();
+                IsMessageShowed = true;
+
             }
 
             if (player.Dead) Restart();
@@ -240,6 +247,7 @@ namespace Project_Jumper
             camera = new Rectangle(new Point(0, 0), Screen.Size);
             GameTime.Start();
             Cursor.Hide();
+            TimeLabel.Font = new Font("Calibri", 48F * Screen.Width / 1920, FontStyle.Bold, GraphicsUnit.Point);
         }
 
         private void GetAllSprites()
@@ -281,10 +289,34 @@ namespace Project_Jumper
 
         private void ShowMessage()
         {
+            UpdateFinishMessage();
+            FinishMessage.Visible = true;
+        }
+
+        private void UpdateFinishMessage()
+        {
             var time = Map.LevelTimeSeconds;
-            MessageBox.Show(@$"Вы победили!
-Ваше время: {LevelConverter.ConvertToDefaultTime(time)}
-Лучшее время: {LevelConverter.ConvertToDefaultTime(Map.BestLevelTime)}");
+            FinishMessage.Text = @$"УРОВЕНЬ ПРОЙДЕН!
+
+ВАШЕ ВРЕМЯ: {LevelConverter.ConvertToDefaultTime(time)}
+ЛУЧШЕЕ ВРЕМЯ: {LevelConverter.ConvertToDefaultTime(Map.BestLevelTime)}";
+            FinishMessage.Size = Screen.Size;
+            FinishMessage.BackColor = Color.FromArgb(160, 0, 0, 0);
+            FinishMessage.Font = new Font("Arial", 100F * Screen.Width / 1920, FontStyle.Bold, GraphicsUnit.Point);
+        }
+
+        private void FinishMessage_Click(object sender, EventArgs e)
+        {
+            if (IsMessageShowed)
+                FinishMessageAction();
+        }
+
+        private void FinishMessageAction()
+        {
+            FinishMessage.Visible = false;
+            LoadNextLevel();
+            IsMessageShowed = false;
+            GameTime.Start();
         }
 
         private void OnPaint(object sender, PaintEventArgs e)
