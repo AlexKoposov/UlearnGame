@@ -73,9 +73,29 @@ namespace Project_Jumper_Tests
         [Test]
         public void Jump()
         {
-            var player = new Player(new Point(1, 2), 10) { Jumping = true };
+            var player = new Player(new Point(1, 1), 10) { Jumping = true };
             var prevY = player.Y;
             player.Move(map, 10);
+            Assert.IsTrue(prevY < player.Y);
+        }
+
+        [Test]
+        public void NotJumpWhenFalling()
+        {
+            var player = new Player(new Point(1, 2), 10) { Jumping = true, Falling = true };
+            var prevY = player.Y;
+            for (var i = 0; i < 100; i++)
+                player.Move(map, 10);
+            Assert.IsTrue(prevY > player.Y);
+        }
+
+        [Test]
+        public void NotJumpWhenFallingWithChangedGravity()
+        {
+            var player = new Player(new Point(1, 2), 10) { Jumping = true, Falling = true, Gravity = -1 };
+            var prevY = player.Y;
+            for (var i = 0; i < 100; i++)
+                player.Move(map, 10);
             Assert.IsTrue(prevY < player.Y);
         }
 
@@ -138,12 +158,31 @@ namespace Project_Jumper_Tests
         }
 
         [Test]
+        public void JumpOnJumpOrbWithChangedGravity()
+        {
+            var player = new Player(new Point(15, 4), 10) { TriggerTicks = 1, Gravity = -1 };
+            var prevY = player.Y;
+            player.ReactToOrbs(map, 10);
+            player.Move(map, 10);
+            Assert.IsTrue(prevY > player.Y);
+        }
+
+        [Test]
         public void ChangeGravityOnGravityOrb()
         {
             map.ChangeToNextLevel();
             var player = new Player(new Point(10, 4), 10) { TriggerTicks = 1 };
             player.ReactToOrbs(map, 10);
             Assert.IsTrue(player.Gravity == -1);
+        }
+
+        [Test]
+        public void ChangeGravityOnGravityOrbWithChangedGravity()
+        {
+            map.ChangeToNextLevel();
+            var player = new Player(new Point(10, 4), 10) { TriggerTicks = 1, Gravity = -1 };
+            player.ReactToOrbs(map, 10);
+            Assert.IsTrue(player.Gravity == 1);
         }
 
         [Test]
@@ -156,10 +195,30 @@ namespace Project_Jumper_Tests
         }
 
         [Test]
+        public void DieOnSpikesWithChangedGravity()
+        {
+            map.ChangeToNextLevel();
+            var player = new Player(new Point(17, 9), 10) { Falling = true, MovingLeft = true, Gravity = -1 };
+            for (var i = 0; i < 100; i++)
+                player.Move(map, 10);
+            Assert.IsTrue(player.Dead);
+        }
+
+        [Test]
         public void DieOnSaws()
         {
             map.ChangeToNextLevel();
             var player = new Player(new Point(2, 9), 10) { Falling = true };
+            for (var i = 0; i < 100; i++)
+                player.Move(map, 10);
+            Assert.IsTrue(player.Dead);
+        }
+
+        [Test]
+        public void DieOnSawsWithChangedGravity()
+        {
+            map.ChangeToNextLevel();
+            var player = new Player(new Point(2, 7), 10) { Falling = true, Gravity = -1 };
             for (var i = 0; i < 100; i++)
                 player.Move(map, 10);
             Assert.IsTrue(player.Dead);
