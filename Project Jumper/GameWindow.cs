@@ -301,7 +301,7 @@ namespace Project_Jumper
 ВАШЕ ВРЕМЯ: {LevelConverter.ConvertToDefaultTime(time)}
 ЛУЧШЕЕ ВРЕМЯ: {LevelConverter.ConvertToDefaultTime(Map.BestLevelTime)}";
             FinishMessage.Size = Screen.Size;
-            FinishMessage.BackColor = Color.FromArgb(160, 0, 0, 0);
+            FinishMessage.BackColor = Color.FromArgb(230, 64, 64, 64);
             FinishMessage.Font = new Font("Arial", 100F * Screen.Width / 1920, FontStyle.Bold, GraphicsUnit.Point);
         }
 

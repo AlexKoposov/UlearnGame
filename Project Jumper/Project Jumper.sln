@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31112.23
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Project Jumper", "Project Jumper.csproj", "{97B1B11F-3797-4BFD-9E1E-0C27D97D0B52}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Project Jumper", "Project Jumper.csproj", "{97B1B11F-3797-4BFD-9E1E-0C27D97D0B52}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Project Jumper Tests", "..\Project Jumper Tests\Project Jumper Tests.csproj", "{152157B7-5D3B-4176-AA0E-A5A6AB68413E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{97B1B11F-3797-4BFD-9E1E-0C27D97D0B52}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{97B1B11F-3797-4BFD-9E1E-0C27D97D0B52}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{97B1B11F-3797-4BFD-9E1E-0C27D97D0B52}.Release|Any CPU.Build.0 = Release|Any CPU
+		{152157B7-5D3B-4176-AA0E-A5A6AB68413E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{152157B7-5D3B-4176-AA0E-A5A6AB68413E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{152157B7-5D3B-4176-AA0E-A5A6AB68413E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{152157B7-5D3B-4176-AA0E-A5A6AB68413E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
