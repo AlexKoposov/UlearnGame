@@ -5,6 +5,13 @@ using System.Windows.Forms;
 
 namespace Project_Jumper
 {
+    //Управление: A, D, LEFT, RIGHT
+    //Прыжок: W, SPACE, UP
+    //Взаимодействие со сферами: ЛКМ
+    //Пауза: ESCAPE
+    //Перезапуск уровня: R
+    //Сообщение о прохождении уровня можно закрыть: ЛКМ, ESCAPE, SPACE, ENTER
+
     public partial class GameWindow : Form
     {
         public Rectangle Screen;
