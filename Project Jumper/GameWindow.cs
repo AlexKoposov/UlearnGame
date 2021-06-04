@@ -14,12 +14,11 @@ namespace Project_Jumper
 
     public partial class GameWindow : Form
     {
-        public Rectangle Screen;
+        public bool IsLastLevelCompleted { get; set; }
         public bool PauseIsOpened { get; set; }
+        public Rectangle Screen { get; private set; }
         public Map Map { get; private set; }
         public string CurrentPath { get; private set; }
-        private readonly int SizeValue;
-        private readonly Size BlockSize;
         private Player player;
         private Image playerSkin, cubeSkin, ballSkin, jetSkin, border, block, spike, saw, rotatedSaw,
             jumpOrb, gravityOrb, finish, timerBackground, cubePortal, rotatedCubePortal, ballPortal,
@@ -27,15 +26,17 @@ namespace Project_Jumper
         private int degrees, lastSawRotation, lastCubePortalRotation,
             lastBallPortalRotation, lastJetPortalRotation;
         private Rectangle camera;
-        private bool playerLastMoveWasRight = true, IsMessageShowed;
+        private bool playerLastMoveWasRight = true, isMessageShowed;
         private PauseWindow pause;
+        private readonly int sizeValue;
+        private readonly Size blockSize;
 
         public GameWindow()
         {
             Screen = System.Windows.Forms.Screen.FromControl(this).WorkingArea;
-            Screen.Height += 40;
-            SizeValue = Screen.Height / 11;
-            BlockSize = new Size(new Point(SizeValue, SizeValue));
+            Screen = new Rectangle(0, 0, Screen.Width, Screen.Height + 40);
+            sizeValue = Screen.Height / 11;
+            blockSize = new Size(new Point(sizeValue, sizeValue));
 
             InitializeComponent();
             InitialiseForm();
@@ -90,7 +91,7 @@ namespace Project_Jumper
                     break;
                 case Keys.Space:
                     JumpAction();
-                    if (IsMessageShowed)
+                    if (isMessageShowed)
                         FinishMessageAction();
                     break;
                 case Keys.Up:
@@ -100,13 +101,12 @@ namespace Project_Jumper
                     Restart();
                     break;
                 case Keys.Escape:
-                    if (!IsMessageShowed)
+                    if (!isMessageShowed)
                         PauseGame();
-                    if (IsMessageShowed)
-                        FinishMessageAction();
+                    else FinishMessageAction();
                     break;
                 case Keys.Enter:
-                    if (IsMessageShowed)
+                    if (isMessageShowed)
                         FinishMessageAction();
                     break;
 
@@ -159,24 +159,23 @@ namespace Project_Jumper
             degrees += 1;
             player.TriggerTicks++;
 
-            if (player.IsLevelCompleted && !IsMessageShowed)
+            if (player.IsLevelCompleted && !isMessageShowed)
             {
                 LevelTime.Stop();
                 GameTime.Stop();
                 Map.UpdateBestTime();
                 ShowMessage();
-                IsMessageShowed = true;
-
+                isMessageShowed = true;
             }
 
             if (player.Dead) Restart();
 
-            if (player.TriggerTicks != 0) player.ReactToOrbs(Map, SizeValue);
+            if (player.TriggerTicks != 0) player.ReactToOrbs(Map, sizeValue);
 
             if (player.Moving)
             {
                 if (LevelTime.Enabled)
-                    player.Move(Map, SizeValue);
+                    player.Move(Map, sizeValue);
                 else LevelTime.Start();
             }
 
@@ -227,7 +226,7 @@ namespace Project_Jumper
 
         private void Restart()
         {
-            player = new Player(Map.StartPosition, SizeValue);
+            player = new Player(Map.StartPosition, sizeValue);
             LevelTime.Stop();
             Map.ResetTime();
         }
@@ -250,7 +249,7 @@ namespace Project_Jumper
                 .Parent.Parent.Parent.FullName.ToString();
             GetAllSprites();
             Map = new Map();
-            player = new Player(Map.StartPosition, SizeValue);
+            player = new Player(Map.StartPosition, sizeValue);
             camera = new Rectangle(new Point(0, 0), Screen.Size);
             GameTime.Start();
             Cursor.Hide();
@@ -278,7 +277,7 @@ namespace Project_Jumper
 
         private void GetSprite(ref Image inGameSprite, string spriteName)
         {
-            ImageExtensions.GetSprite(ref inGameSprite, spriteName, CurrentPath, BlockSize);
+            ImageExtensions.GetSprite(ref inGameSprite, spriteName, CurrentPath, blockSize);
         }
 
         private void UpdateTimeLabel()
@@ -286,7 +285,7 @@ namespace Project_Jumper
             var time = Map.LevelTimeSeconds;
             TimeLabel.Text = LevelConverter.ConvertToDefaultTime(time);
             TimeLabel.Location = new Point(Screen.Width - TimeLabel.Size.Width + 1, 0);
-            TimeLabel.Image = new Bitmap(timerBackground, TimeLabel.Size);
+            TimeLabel.Image = ImageExtensions.FitInSize(timerBackground, TimeLabel.Size);
         }
 
         private void LevelTime_Tick(object sender, EventArgs e)
@@ -303,7 +302,7 @@ namespace Project_Jumper
         private void UpdateFinishMessage()
         {
             var time = Map.LevelTimeSeconds;
-            FinishMessage.Text = @$"УРОВЕНЬ ПРОЙДЕН!
+            FinishMessage.Text = @$"{(IsLastLevelCompleted ? "ИГРА ПРОЙДЕНА!" : "УРОВЕНЬ ПРОЙДЕН!")}
 
 ВАШЕ ВРЕМЯ: {LevelConverter.ConvertToDefaultTime(time)}
 ЛУЧШЕЕ ВРЕМЯ: {LevelConverter.ConvertToDefaultTime(Map.BestLevelTime)}";
@@ -314,7 +313,7 @@ namespace Project_Jumper
 
         private void FinishMessage_Click(object sender, EventArgs e)
         {
-            if (IsMessageShowed)
+            if (isMessageShowed)
                 FinishMessageAction();
         }
 
@@ -322,7 +321,7 @@ namespace Project_Jumper
         {
             FinishMessage.Visible = false;
             LoadNextLevel();
-            IsMessageShowed = false;
+            isMessageShowed = false;
             GameTime.Start();
         }
 
@@ -336,11 +335,11 @@ namespace Project_Jumper
         private void DrawMap(Graphics g)
         {
             var converted = ConvertMathToWorld(camera.X, camera.Y);
-            var mapY = (converted.Y - camera.Height) / SizeValue;
+            var mapY = (converted.Y - camera.Height) / sizeValue;
             if (mapY < 0) mapY = 0;
-            for (var i = converted.X / SizeValue; i < Map.Width
-                && i <= (converted.X + camera.Width) / SizeValue; i++)
-                for (var j = mapY; j < Map.Height && j <= converted.Y / SizeValue; j++)
+            for (var i = converted.X / sizeValue; i < Map.Width
+                && i <= (converted.X + camera.Width) / sizeValue; i++)
+                for (var j = mapY; j < Map.Height && j <= converted.Y / sizeValue; j++)
                     switch (Map.Level[i, j].Type)
                     {
                         case "Border":
@@ -413,31 +412,31 @@ namespace Project_Jumper
 
         private void DrawMapElement(Image e, Graphics g, int i, int j)
         {
-            g.DrawImage(e, ApplyCameraOffset(i * SizeValue, j * SizeValue));
+            g.DrawImage(e, ApplyCameraOffset(i * sizeValue, j * sizeValue));
         }
 
         private Point ConvertMathToWorld(int x, int y) =>
-            new Point(x, Map.Height * SizeValue - y);
+            new Point(x, Map.Height * sizeValue - y);
 
         private Point ApplyCameraOffset(int x, int y)
         {
             var point = ConvertMathToWorld(x, y);
             point.X -= camera.X;
-            point.Y -= camera.Y + SizeValue;
+            point.Y -= camera.Y + sizeValue;
             return point;
         }
 
         private void UpdateCamera()
         {
-            camera.X = player.X - camera.Width / 2 + SizeValue;
+            camera.X = player.X - camera.Width / 2 + sizeValue;
             if (camera.X < 0) camera.X = 0;
-            else if (camera.X + camera.Width > Map.Width * SizeValue)
-                camera.X = Map.Width * SizeValue - camera.Width;
+            else if (camera.X + camera.Width > Map.Width * sizeValue)
+                camera.X = Map.Width * sizeValue - camera.Width;
 
-            camera.Y = Map.Height * SizeValue - player.Y - camera.Height / 2 + SizeValue / 2;
+            camera.Y = Map.Height * sizeValue - player.Y - camera.Height / 2 + sizeValue / 2;
             if (camera.Y < 0) camera.Y = 0;
-            else if (camera.Y + camera.Height > Map.Height * SizeValue)
-                camera.Y = Map.Height * SizeValue - camera.Height;
+            else if (camera.Y + camera.Height > Map.Height * sizeValue)
+                camera.Y = Map.Height * sizeValue - camera.Height;
         }
     }
 }

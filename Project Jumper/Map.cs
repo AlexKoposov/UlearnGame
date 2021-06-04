@@ -2,19 +2,20 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace Project_Jumper
 {
     public class Map
     {
         public MapCell[,] Level { get; private set; }
-        public List<string> AvailableLevels { get; private set; }
         public int LevelTimeSeconds { get; private set; }
         public int BestLevelTime { get; private set; }
         public int Width => Level.GetLength(0);
         public int Height => Level.GetLength(1);
         public readonly Point StartPosition;
         private int levelId = 0;
+        private List<string> AvailableLevels { get; set; }
         private readonly List<Tuple<int, string>> converted;
 
         public Map()
@@ -31,10 +32,20 @@ namespace Project_Jumper
         public void ChangeToNextLevel()
         {
             ChangeLevel();
+            if (levelId == AvailableLevels.Count - 1)
+            {
+                var currentForm = (GameWindow)Application.OpenForms["GameWindow"];
+                currentForm.IsLastLevelCompleted = true;
+            }
         }
 
         public void ChangeToPrevLevel()
         {
+            if (levelId == AvailableLevels.Count - 1)
+            {
+                var currentForm = (GameWindow)Application.OpenForms["GameWindow"];
+                currentForm.IsLastLevelCompleted = false;
+            }
             ChangeLevel(-1);
         }
 
@@ -72,7 +83,13 @@ namespace Project_Jumper
                 Level = MapBuilder.CreateMap(AvailableLevels[levelId]);
                 BestLevelTime = converted[levelId].Item1;
             }
-            else levelId = levelId >= 0 ? AvailableLevels.Count - 1 : 0;
+            else if (levelId >= 0)
+            {
+                levelId = AvailableLevels.Count - 1;
+                var currentForm = (GameWindow)Application.OpenForms["GameWindow"];
+                currentForm.IsLastLevelCompleted = true;
+            }
+            else levelId = 0;
         }
     }
 }

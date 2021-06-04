@@ -9,25 +9,25 @@ namespace Project_Jumper
         public bool MovingRight { get; set; }
         public bool MovingLeft { get; set; }
         public bool Jumping { get; set; }
-        public bool IsJumpOrbActive { get; set; }
         public bool Falling { get; set; }
         public bool Flying { get; set; }
-        public bool Dead { get; set; }
-        public bool IsLevelCompleted { get; set; }
         public int FallTicks { get; set; }
         public int FlyTicks { get; set; }
         public int TriggerTicks { get; set; }
         public Gamemodes GameMode { get; set; }
+        public bool Dead { get; private set; }
+        public bool IsLevelCompleted { get; private set; }
         public int Gravity { get; private set; }
         public int X { get; private set; }
         public int Y { get; private set; }
-        public int VelX { get; private set; }
-        public int VelY { get; private set; }
         public bool Moving => MovingRight
             || MovingLeft
             || Falling
             || Jumping
             || Flying;
+        private bool IsJumpOrbActive { get; set; }
+        private int VelX { get; set; }
+        private int VelY { get; set; }
         private int Velocity { get; set; }
         private int MaxFallingVel { get; set; }
         private int MaxFlyingVel { get; set; }
@@ -153,13 +153,7 @@ namespace Project_Jumper
             {
                 var leftDown = new Point((int)Math.Floor((double)dirX / size), (int)Math.Floor((double)Y / size));
                 var leftUp = new Point((int)Math.Floor((double)dirX / size), (int)Math.Ceiling((double)Y / size));
-                if (CheckCollision(map, leftDown, leftUp))
-                {
-                    X = (leftDown.X + 1) * size;
-                    VelX = 0;
-                }
-                CheckFriendlyness(map, leftDown, leftUp);
-                CheckLevelCompletion(map, leftDown, leftUp);
+                CollideX(map, size, leftUp, leftDown, true);
             }
 
             if (dirX > (map.Width - 1) * size)
@@ -171,16 +165,21 @@ namespace Project_Jumper
             {
                 var rightDown = new Point((int)Math.Ceiling((double)dirX / size), (int)Math.Floor((double)Y / size));
                 var rightUp = new Point((int)Math.Ceiling((double)dirX / size), (int)Math.Ceiling((double)Y / size));
-                if (CheckCollision(map, rightDown, rightUp))
-                {
-                    X = (rightDown.X - 1) * size;
-                    VelX = 0;
-                }
-                CheckFriendlyness(map, rightDown, rightUp);
-                CheckLevelCompletion(map, rightDown, rightUp);
+                CollideX(map, size, rightUp, rightDown, false);
             }
 
             X += VelX;
+        }
+
+        private void CollideX(Map map, int size, Point first, Point second, bool defaultIsLeft)
+        {
+            if (CheckCollision(map, first, second))
+            {
+                X = (first.X + (defaultIsLeft ? 1 : -1)) * size;
+                VelX = 0;
+            }
+            CheckFriendlyness(map, first, second);
+            CheckLevelCompletion(map, first, second);
         }
 
         private void ProcessCollisionY(Map map, int size)

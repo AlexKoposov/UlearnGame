@@ -25,7 +25,7 @@ namespace Project_Jumper
             inGameSprite = FitInSize(new Bitmap(Path.Combine(currentPath, $"Resources\\{spriteName}.png")), imageSize);
         }
 
-        private static Image FitInSize(Image image, Size imageSize) =>
+        public static Image FitInSize(Image image, Size imageSize) =>
             new Bitmap(image, imageSize);
     }
 }
