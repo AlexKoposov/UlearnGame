@@ -110,19 +110,19 @@ namespace Project_Jumper
                         FinishMessageAction();
                     break;
 
-                //DevTools
+                    //DevTools
 
-                case Keys.D1:
-                    player.GameMode = Gamemodes.Cube;
-                    DisableFlying();
-                    break;
-                case Keys.D2:
-                    player.GameMode = Gamemodes.Ball;
-                    DisableFlying();
-                    break;
-                case Keys.D3:
-                    player.GameMode = Gamemodes.Jetpack;
-                    break;
+                    //case Keys.D1:
+                    //    player.GameMode = Gamemodes.Cube;
+                    //    DisableFlying();
+                    //    break;
+                    //case Keys.D2:
+                    //    player.GameMode = Gamemodes.Ball;
+                    //    DisableFlying();
+                    //    break;
+                    //case Keys.D3:
+                    //    player.GameMode = Gamemodes.Jetpack;
+                    //    break;
                     //case Keys.D0:
                     //    map.ResetBestTime();
                     //    break;

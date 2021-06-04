@@ -5,9 +5,9 @@ namespace Project_Jumper
 {
     public class MapBuilder
     {
-        public static MapCell[,] CreateMap(string map, string separator = "\r\n")
+        public static MapCell[,] CreateMap(string map)
         {
-            var rows = map.Split(new[] { separator }, StringSplitOptions.RemoveEmptyEntries)
+            var rows = map.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
                 .Reverse()
                 .ToArray();
             if (rows.Select(z => z.Length).Distinct().Count() != 1)
