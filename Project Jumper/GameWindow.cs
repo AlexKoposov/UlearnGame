@@ -245,8 +245,7 @@ namespace Project_Jumper
 
         private void InitialiseForm()
         {
-            CurrentPath = new DirectoryInfo(Directory.GetCurrentDirectory())
-                .Parent.Parent.Parent.FullName.ToString();
+            CurrentPath = new DirectoryInfo(Directory.GetCurrentDirectory()).FullName.ToString();
             GetAllSprites();
             Map = new Map();
             player = new Player(Map.StartPosition, sizeValue);

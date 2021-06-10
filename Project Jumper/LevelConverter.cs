@@ -7,7 +7,7 @@ namespace Project_Jumper
 {
     class LevelConverter
     {
-        private readonly static string currentPath = new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName.ToString();
+        private readonly static string currentPath = new DirectoryInfo(Directory.GetCurrentDirectory()).FullName.ToString();
 
         public static List<Tuple<int, string>> GetAllLevels()
         {
