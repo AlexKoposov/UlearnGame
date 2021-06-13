@@ -123,6 +123,7 @@ namespace Project_Jumper
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Jumper";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+            this.Load += new System.EventHandler(this.PauseWindow_Load);
             ((System.ComponentModel.ISupportInitialize)(this.ContinueButton)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.NextLevelButton)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.PrevLevelButton)).EndInit();

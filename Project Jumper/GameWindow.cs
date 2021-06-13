@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
+using System.Media;
 
 namespace Project_Jumper
 {
@@ -30,6 +31,7 @@ namespace Project_Jumper
         private PauseWindow pause;
         private readonly int sizeValue;
         private readonly Size blockSize;
+        public readonly SoundPlayer SP;
 
         public GameWindow()
         {
@@ -40,6 +42,9 @@ namespace Project_Jumper
 
             InitializeComponent();
             InitialiseForm();
+
+            SP = new SoundPlayer(Path.Combine(CurrentPath, "Resources\\MainTheme.wav"));
+            SP.PlayLooping();
         }
 
         public void OnKeyUp(object sender, KeyEventArgs e)

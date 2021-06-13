@@ -75,6 +75,11 @@ namespace Project_Jumper
             ExitForm();
         }
 
+        private void PauseWindow_Load(object sender, EventArgs e)
+        {
+
+        }
+
         private void ResetTimeButton_Click(object sender, EventArgs e)
         {
             Parent.Map.ResetBestTime();
